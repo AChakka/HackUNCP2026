@@ -154,8 +154,15 @@
 }
 
 @keyframes coroner-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ── Input row ──────────────────────────────────────────────────────────────── */
@@ -247,9 +254,18 @@
   padding-bottom: 0.25rem;
 }
 
-.coroner-report-markdown h1 { font-size: 1.5rem; }
-.coroner-report-markdown h2 { font-size: 1.3rem; }
-.coroner-report-markdown h3 { font-size: 1.1rem; }
+.coroner-report-markdown h1 {
+  font-size: 1.5rem;
+}
+
+.coroner-report-markdown h2 {
+  font-size: 1.3rem;
+}
+
+.coroner-report-markdown h3 {
+  font-size: 1.1rem;
+}
+
 .coroner-report-markdown p {
   margin-bottom: 1rem;
 }
@@ -311,4 +327,58 @@
 .coroner-report-markdown th {
   background: #1a1a1a;
   color: #fff;
+}
+
+/* ── PDF Export Clone Styling (Universal Design) ──────────────────────────────── */
+.pdf-export-clone {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  padding: 1rem !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 14px !important;
+}
+
+.pdf-export-clone .coroner-report-markdown {
+  font-family: inherit !important;
+  color: #111827 !important;
+}
+
+.pdf-export-clone * {
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+}
+
+.pdf-export-clone h1,
+.pdf-export-clone h2,
+.pdf-export-clone h3,
+.pdf-export-clone h4 {
+  color: #000000 !important;
+  border-bottom-color: #e5e7eb !important;
+  margin-top: 1rem !important;
+}
+
+.pdf-export-clone blockquote {
+  border-left-color: #6b7280 !important;
+  color: #4b5563 !important;
+  background: #f9fafb !important;
+}
+
+.pdf-export-clone pre {
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.pdf-export-clone code {
+  background: #f3f4f6 !important;
+  color: #b91c1c !important;
+}
+
+.pdf-export-clone th {
+  background: #f9fafb !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.pdf-export-clone td {
+  border: 1px solid #d1d5db !important;
 }

@@ -64,42 +64,79 @@ function CoronerPage() {
   const handleDownload = async () => {
     if (!reportRef.current) return;
     try {
-      const oldMaxHeight = reportRef.current.style.maxHeight;
-      const oldOverflow = reportRef.current.style.overflow;
-      reportRef.current.style.maxHeight = 'none';
-      reportRef.current.style.overflow = 'visible';
+      setLoading(true);
+      // 1. Create a hidden clone to apply universal design styles independently of dark mode
+      const clone = reportRef.current.cloneNode(true);
 
-      const canvas = await html2canvas(reportRef.current, { scale: 2, backgroundColor: '#050505' });
-      
-      reportRef.current.style.maxHeight = oldMaxHeight;
-      reportRef.current.style.overflow = oldOverflow;
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.width = '800px';
+      clone.style.backgroundColor = '#ffffff';
+      clone.style.color = '#111827';
+      clone.style.maxHeight = 'none';
+      clone.style.overflow = 'visible';
 
+      clone.classList.add('pdf-export-clone');
+      document.body.appendChild(clone);
+
+      // 2. Capture canvas with forced white background
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false
+      });
+
+      document.body.removeChild(clone);
+
+      // 3. Setup standard A4 document
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
+      const margin = 20; // 20mm uniform margin (~0.8 inches)
+
+      const contentWidth = pdfWidth - (margin * 2);
+      const contentHeight = pdfHeight - (margin * 2);
+
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = pdfWidth / imgWidth;
-      
+
+      const ratio = contentWidth / imgWidth;
       const scaledHeight = imgHeight * ratio;
+
       let heightLeft = scaledHeight;
-      let position = 0;
+      let position = margin;
 
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
-      heightLeft -= pdfHeight;
+      // 4. Print first page
+      pdf.addImage(imgData, 'PNG', margin, position, contentWidth, scaledHeight);
+      heightLeft -= contentHeight;
 
+      // Mask bottom margin to prevent image bleed
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
+
+      // 5. Handle subsequent pages
       while (heightLeft > 0) {
-        position -= pdfHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
-        heightLeft -= pdfHeight;
+        position -= contentHeight;
+        pdf.addImage(imgData, 'PNG', margin, position, contentWidth, scaledHeight);
+
+        // Mask top and bottom margins for a clean professional look
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, pdfWidth, margin, 'F');
+        pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
+
+        heightLeft -= contentHeight;
       }
 
       pdf.save(`coroner_report_${file_name || 'export'}.pdf`);
     } catch (err) {
       console.error("Failed to generate PDF", err);
+    } finally {
+      setLoading(false);
     }
   }
 
