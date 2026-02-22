@@ -1,35 +1,29 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from services.extract import extract_solana_wallets
 from services.solana import profile_wallet
 from services.scoring import score_wallet
+from services.extract import extract_solana_wallets
 
 app = FastAPI(title="Crypto Module")
 
-class ExtractReq(BaseModel):
-    text: str
-
-class AnalyzeReq(BaseModel):
+class TraceReq(BaseModel):
     wallet: str
-    limit: int = 25
+    limit: int = 20
 
-@app.get("/")
-def root():
-    return {"ok": True, "service": "crypto-module"}
-
-@app.post("/extract")
-def extract(req: ExtractReq):
-    wallets = extract_solana_wallets(req.text)
-    return {"wallets": wallets, "count": len(wallets)}
-
-@app.post("/analyze")
-def analyze(req: AnalyzeReq):
+@app.post("/trace")
+def trace(req: TraceReq):
     profile = profile_wallet(req.wallet, limit=req.limit)
-    score, flags, label = score_wallet(profile)
+    edges = []
+    for cp in profile.get("top_counterparties", []):
+        edges.append({
+            "from": req.wallet,
+            "to": cp["wallet"],
+            "count": cp["count"]
+        })
 
     return {
         "wallet": req.wallet,
-        "profile": profile,
-        "risk": {"score": score, "label": label, "flags": flags}
+        "nodes": [req.wallet] + [c["wallet"] for c in profile.get("top_counterparties", [])],
+        "edges": edges
     }

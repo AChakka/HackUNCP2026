@@ -2,16 +2,21 @@ def score_wallet(profile: dict):
     score = 0
     flags = []
 
-    txc = profile.get("tx_count_sampled", 0)
+    txc = profile.get("tx_count", 0)
 
     if txc >= 40:
-        score += 40
-        flags.append("High transaction volume (sampled)")
+        score += 60
+        flags.append("High transaction volume (recent sample)")
 
-    if txc >= 15:
-        score += 25
-        flags.append("Active wallet")
+    elif txc >= 15:
+        score += 35
+        flags.append("Moderate transaction volume (recent sample)")
 
+    elif txc >= 5:
+        score += 15
+        flags.append("Some recent activity")
+
+    # clamp
     score = min(score, 100)
 
     label = "LOW"
