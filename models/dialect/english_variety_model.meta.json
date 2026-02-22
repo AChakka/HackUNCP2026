@@ -1,0 +1,17 @@
+{
+  "created_utc": "2026-02-22T08:41:31Z",
+  "classes": [
+    "au",
+    "gb",
+    "ie",
+    "in",
+    "us"
+  ],
+  "meaning": {
+    "us": "American",
+    "gb": "British",
+    "au": "Australian",
+    "ie": "Irish",
+    "in": "Indian"
+  }
+}
