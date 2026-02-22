@@ -107,35 +107,44 @@ The clock is ticking. You have been warned.`
 // ── Loading animation ──────────────────────────────────────────────────────
 
 function LoadingDisplay({ stage }) {
+  const R = 78
+  const CIRCUMFERENCE = 2 * Math.PI * R
+  const progress = Math.min((stage + 0.75) / STAGES.length, 1)
+  const offset = CIRCUMFERENCE * (1 - progress)
+
   return (
-    <div className="rp-loading">
-      <div className="rp-loading-circles">
-        {STAGES.map((label, i) => (
-          <div key={i} className={`rp-stage ${i < stage ? 'done' : i === stage ? 'active' : ''}`}>
-            <div className="rp-stage-circle">
-              {i < stage ? (
-                <svg viewBox="0 0 36 36" width="36" height="36">
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="#c0392b" strokeWidth="2" />
-                  <polyline points="10,18 16,24 26,12" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              ) : i === stage ? (
-                <svg viewBox="0 0 36 36" width="36" height="36" className="rp-spin">
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="#333" strokeWidth="2" />
-                  <path d="M18 3 A15 15 0 0 1 33 18" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 36 36" width="36" height="36">
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="#222" strokeWidth="2" />
-                </svg>
-              )}
-            </div>
-            <span className={`rp-stage-label ${i === stage ? 'rp-stage-active' : ''}`}>{label}</span>
-          </div>
-        ))}
+    <div className="loading-overlay">
+      <div className="loading-center">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <circle cx="100" cy="100" r={R} fill="none" stroke="#111" strokeWidth="3" />
+          <circle
+            cx="100" cy="100" r={R}
+            fill="none"
+            stroke="#c0392b"
+            strokeWidth="3"
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={offset}
+            strokeLinecap="butt"
+            transform="rotate(-90 100 100)"
+            style={{ transition: 'stroke-dashoffset 2s linear' }}
+          />
+          <text x="100" y="93" textAnchor="middle" fontSize="9" fontFamily="monospace" fill="#2a2a2a" letterSpacing="3">CORONER</text>
+          <text x="100" y="113" textAnchor="middle" fontSize="20" fontFamily="monospace" fill="#c0392b" fontWeight="bold">
+            {stage + 1}/{STAGES.length}
+          </text>
+        </svg>
+
+        <div className="loading-stage-list">
+          {STAGES.map((label, i) => (
+            <p key={i} className={`loading-stage-row ${
+              i < stage ? 'loading-row--done' : i === stage ? 'loading-row--active' : 'loading-row--pending'
+            }`}>
+              <span className="loading-row-icon">{i < stage ? '[X]' : i === stage ? '[>]' : '[ ]'}</span>
+              {label}
+            </p>
+          ))}
+        </div>
       </div>
-      <p className="rp-loading-status">
-        {stage < STAGES.length ? `[ ${STAGES[stage]} ]` : '[ DONE ]'}
-      </p>
     </div>
   )
 }

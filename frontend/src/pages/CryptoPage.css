@@ -94,24 +94,33 @@
 
 .wallet-input {
   flex: 1;
-  background: #080808;
-  border: 1px solid #1f1f1f;
-  color: #fff;
+  background: #0a0a0a;
+  /* pixel dot grid texture */
+  background-image: radial-gradient(circle, #1d1d1d 1px, transparent 1px);
+  background-size: 4px 4px;
+  /* sunken 2000s dialog-box border */
+  border: 2px solid;
+  border-color: #111 #484848 #484848 #111;
+  box-shadow: 2px 2px 0 #000;
+  color: #e8e8e8;
   font-family: monospace;
   font-size: 0.78rem;
   padding: 0.7rem 1rem;
   outline: none;
-  transition: border-color 0.15s;
+  transition: none;
   cursor: none;
   letter-spacing: 0.04em;
 }
 
 .wallet-input::placeholder {
-  color: #2a2a2a;
+  color: #333;
 }
 
 .wallet-input:focus {
-  border-color: #333;
+  background-image: none;
+  background-color: #111;
+  border-color: #888 #222 #222 #888;
+  box-shadow: 2px 2px 0 #000, inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 
 /* Crypto dropzone */
@@ -436,64 +445,54 @@
   border: 1px solid #0d0d0d;
 }
 
-/* Loading display */
-.loading-display {
+/* ── Full-screen loading overlay ──────────────────────────────── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.94);
+  z-index: 5000;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.5rem;
-  padding: 1.5rem 0;
+  align-items: center;
+  justify-content: center;
 }
 
-.loading-circles {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.loading-circle-wrap {
+.loading-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  width: 60px;
+  gap: 2.5rem;
 }
 
-.loading-svg {
-  overflow: visible;
+.loading-stage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
-.loading-stage-label {
-  font-family: monospace;
-  font-size: 0.42rem;
-  letter-spacing: 0.1em;
-  color: #1a1a1a;
-  text-align: center;
-  line-height: 1.3;
-  word-break: break-word;
-  transition: color 0.3s;
-}
-
-.loading-stage-label--active {
-  color: #c0392b;
-}
-
-.loading-stage-label--done {
-  color: #333;
-}
-
-.loading-status {
+.loading-stage-row {
   font-family: monospace;
   font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  color: #c0392b;
-  animation: blink 1.1s step-start infinite;
+  letter-spacing: 0.14em;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
 }
+
+.loading-row-icon {
+  font-family: monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.loading-row--done    { color: #222; }
+.loading-row--active  { color: #c0392b; animation: blink 1s step-start infinite; }
+.loading-row--pending { color: #111; }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
+  50%       { opacity: 0.15; }
 }
 
 /* ── Counterparty label badge ──────────────────────────────────── */

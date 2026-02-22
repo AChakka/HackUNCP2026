@@ -53,48 +53,47 @@ const STAGES = [
 const STAGE_DURATION = 2400
 
 function LoadingDisplay({ stage }) {
-  const RADIUS = 18
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+  const R = 78
+  const CIRCUMFERENCE = 2 * Math.PI * R
+  const progress = Math.min((stage + 0.75) / STAGES.length, 1)
+  const offset = CIRCUMFERENCE * (1 - progress)
 
   return (
-    <div className="loading-display">
-      <div className="loading-circles">
-        {STAGES.map((label, i) => {
-          const filled = i < stage
-          const active = i === stage
-          const progress = filled ? 1 : active ? 0.85 : 0
-          const offset = CIRCUMFERENCE * (1 - progress)
-          return (
-            <div key={i} className="loading-circle-wrap">
-              <svg className="loading-svg" viewBox="0 0 44 44" width="44" height="44">
-                <circle cx="22" cy="22" r={RADIUS} fill="none" stroke="#111" strokeWidth="2" />
-                <circle
-                  cx="22" cy="22" r={RADIUS}
-                  fill="none"
-                  stroke={filled ? '#c0392b' : active ? '#c0392b' : '#1a1a1a'}
-                  strokeWidth="2"
-                  strokeDasharray={CIRCUMFERENCE}
-                  strokeDashoffset={offset}
-                  strokeLinecap="butt"
-                  transform="rotate(-90 22 22)"
-                  className={active ? 'loading-arc--active' : ''}
-                  style={{ transition: filled ? 'stroke-dashoffset 0.4s ease' : 'stroke-dashoffset 2.2s linear' }}
-                />
-                <text x="22" y="26" textAnchor="middle" fontSize="10" fontFamily="monospace"
-                  fill={filled || active ? '#c0392b' : '#222'}>
-                  {String(i + 1).padStart(2, '0')}
-                </text>
-              </svg>
-              <span className={`loading-stage-label ${active ? 'loading-stage-label--active' : filled ? 'loading-stage-label--done' : ''}`}>
-                {label}
-              </span>
-            </div>
-          )
-        })}
+    <div className="loading-overlay">
+      <div className="loading-center">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          {/* track ring */}
+          <circle cx="100" cy="100" r={R} fill="none" stroke="#111" strokeWidth="3" />
+          {/* progress ring */}
+          <circle
+            cx="100" cy="100" r={R}
+            fill="none"
+            stroke="#c0392b"
+            strokeWidth="3"
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={offset}
+            strokeLinecap="butt"
+            transform="rotate(-90 100 100)"
+            style={{ transition: 'stroke-dashoffset 2s linear' }}
+          />
+          {/* inner label */}
+          <text x="100" y="93" textAnchor="middle" fontSize="9" fontFamily="monospace" fill="#2a2a2a" letterSpacing="3">CORONER</text>
+          <text x="100" y="113" textAnchor="middle" fontSize="20" fontFamily="monospace" fill="#c0392b" fontWeight="bold">
+            {stage + 1}/{STAGES.length}
+          </text>
+        </svg>
+
+        <div className="loading-stage-list">
+          {STAGES.map((label, i) => (
+            <p key={i} className={`loading-stage-row ${
+              i < stage ? 'loading-row--done' : i === stage ? 'loading-row--active' : 'loading-row--pending'
+            }`}>
+              <span className="loading-row-icon">{i < stage ? '[X]' : i === stage ? '[>]' : '[ ]'}</span>
+              {label}
+            </p>
+          ))}
+        </div>
       </div>
-      <p className="loading-status">
-        {stage < STAGES.length ? STAGES[stage] : 'FINALIZING...'}
-      </p>
     </div>
   )
 }

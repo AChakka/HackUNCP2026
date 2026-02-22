@@ -5,6 +5,60 @@
   cursor: none;
 }
 
+/* ── Custom scrollbar — pixelated ────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #000 0px, #000 6px,
+    #0a0a0a 6px, #0a0a0a 8px
+  );
+}
+
+::-webkit-scrollbar-thumb {
+  image-rendering: pixelated;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #fff  0px,  #fff  4px,
+    #000  4px,  #000  5px,
+    #fff  5px,  #fff  9px,
+    #000  9px,  #000 10px,
+    #ddd 10px, #ddd 14px,
+    #000 14px, #000 15px,
+    #fff 15px, #fff 19px,
+    #000 19px, #000 20px
+  );
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #fff  0px,  #fff  4px,
+    #111  4px,  #111  5px,
+    #fff  5px,  #fff  9px,
+    #111  9px,  #111 10px,
+    #fff 10px, #fff 14px,
+    #111 14px, #111 15px,
+    #fff 15px, #fff 19px,
+    #111 19px, #111 20px
+  );
+}
+
+::-webkit-scrollbar-corner {
+  background: #000;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #fff #000;
+}
+
 /* Custom cursor */
 .custom-cursor {
   position: fixed;
