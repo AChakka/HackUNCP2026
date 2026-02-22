@@ -1,6 +1,27 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 import bloodImg from './assets/9gtem78jepmgj4390oifvtpo12.png'
+import cursorImg from './assets/7qm8h0d555imegvquob85gn0ve.png'
+
+function Cursor() {
+  const [pos, setPos] = useState({ x: -200, y: -200 })
+
+  useEffect(() => {
+    const move = (e) => setPos({ x: e.clientX, y: e.clientY })
+    window.addEventListener('mousemove', move)
+    return () => window.removeEventListener('mousemove', move)
+  }, [])
+
+  return (
+    <img
+      src={cursorImg}
+      className="custom-cursor"
+      style={{ left: pos.x, top: pos.y }}
+      aria-hidden="true"
+      alt=""
+    />
+  )
+}
 
 function App() {
   const [dragOver, setDragOver] = useState(false)
@@ -38,6 +59,14 @@ function App() {
 
   return (
     <div className="app">
+      <Cursor />
+
+      {/* Blood decorations */}
+      <img src={bloodImg} className="blood-deco blood-deco--tl" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--tr" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--bl" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--br" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--mid" alt="" aria-hidden="true" />
 
       {/* Header */}
       <header className="header">
@@ -60,7 +89,7 @@ function App() {
         <div className="hero">
           <div className="ascii-wrap">
             <img src={bloodImg} className="blood-bg" alt="" aria-hidden="true" />
-          <pre className="ascii-logo">{` ▄████▄   ▒█████   ██▀███   ▒█████   ███▄    █ ▓█████  ██▀███
+            <pre className="ascii-logo">{` ▄████▄   ▒█████   ██▀███   ▒█████   ███▄    █ ▓█████  ██▀███
 ▒██▀ ▀█  ▒██▒  ██▒▓██ ▒ ██▒▒██▒  ██▒ ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒
 ▒▓█    ▄ ▒██░  ██▒▓██ ░▄█ ▒▒██░  ██▒▓██  ▀█ ██▒▒███   ▓██ ░▄█ ▒
 ▒▓▓▄ ▄██▒▒██   ██░▒██▀▀█▄  ▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄ ▒██▀▀█▄
@@ -86,27 +115,30 @@ function App() {
 
           {!file ? (
             <div className="drop-content">
+              <p className="drop-tag">// EVIDENCE INTAKE //</p>
               <div className="drop-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                  <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
                 </svg>
               </div>
-              <p className="drop-primary">Drag &amp; drop file here</p>
-              <p className="drop-secondary">or click to browse</p>
+              <p className="drop-primary">DROP EVIDENCE HERE</p>
+              <p className="drop-secondary">disk images / memory dumps / raw files</p>
+              <p className="drop-secondary">_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _</p>
             </div>
           ) : (
             <div className="file-preview">
+              <div className="file-meta-tag">EXHIBIT A</div>
               <div className="file-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
+                  <line x1="8" y1="13" x2="16" y2="13"/>
+                  <line x1="8" y1="17" x2="16" y2="17"/>
                 </svg>
               </div>
               <div className="file-info">
                 <p className="file-name">{file.name}</p>
-                <p className="file-size">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p className="file-size">{(file.size / 1024 / 1024).toFixed(2)} MB &nbsp;|&nbsp; PENDING ANALYSIS</p>
               </div>
               <button className="clear-btn" onClick={(e) => { e.stopPropagation(); handleClear() }}>x</button>
             </div>
