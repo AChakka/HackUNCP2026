@@ -29,3 +29,8 @@ def build_timeline_tool(file_paths: list[str]):
 
 def save_timeline_tool(events: list[dict], output_path: str):
     return save_timeline_csv(events, output_path)
+
+from forensic_engine.analysis import run_yara
+
+def scan_yara_tool(file_path: str):
+    return run_yara(file_path)
