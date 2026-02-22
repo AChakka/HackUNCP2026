@@ -141,6 +141,46 @@
   transform: translateY(-50%) rotate(90deg);
 }
 
+.blood-deco--mid-left {
+  top: 50%;
+  left: -50px;
+  width: 170px;
+  transform: translateY(-50%) rotate(-90deg) scaleY(-1);
+  opacity: 0.28;
+}
+
+.blood-deco--top-mid {
+  top: -30px;
+  left: 50%;
+  width: 140px;
+  transform: translateX(-50%) rotate(180deg);
+  opacity: 0.22;
+}
+
+.blood-deco--bot-mid {
+  bottom: -20px;
+  left: 38%;
+  width: 150px;
+  transform: rotate(15deg) scaleX(-1);
+  opacity: 0.25;
+}
+
+.blood-deco--inner-tl {
+  top: 18%;
+  left: 2%;
+  width: 110px;
+  transform: rotate(70deg) scaleX(-1);
+  opacity: 0.18;
+}
+
+.blood-deco--inner-br {
+  bottom: 22%;
+  right: 2%;
+  width: 120px;
+  transform: rotate(250deg);
+  opacity: 0.18;
+}
+
 /* Header */
 .header {
   border-bottom: 1px solid #111;
