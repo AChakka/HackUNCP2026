@@ -12,11 +12,17 @@ HEADERS = {
 def submit_file(file_path):
     with open(file_path, "rb") as f:
         files = {"file": (file_path, f)}
-        res = requests.post(f"{BASE}/submit/file", headers=HEADERS, files=files)
+        
+        # FIX 1: Tell the sandbox WHICH environment to run the file in.
+        # Environment 120 = Windows 7 64-bit (Standard for PE malware analysis)
+        data = {"environment_id": 120} 
+        
+        res = requests.post(f"{BASE}/submit/file", headers=HEADERS, files=files, data=data)
         return res.json()
 
 def get_report(job_id):
-    res = requests.get(f"{BASE}/report/{job_id}", headers=HEADERS)
+    # FIX 2: Append '/summary' to the endpoint so the API knows what to return
+    res = requests.get(f"{BASE}/report/{job_id}/summary", headers=HEADERS)
     return res.json()
 
 def search_hash(sha256):
