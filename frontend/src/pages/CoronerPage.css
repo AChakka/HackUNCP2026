@@ -1,0 +1,406 @@
+.coroner-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.coroner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 1rem;
+}
+
+.coroner-session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.coroner-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: #c0392b;
+}
+
+.coroner-file {
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem;
+  color: #fff;
+}
+
+.coroner-download-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  background: #0a0a0a;
+  color: #c0392b;
+  border: 1px solid;
+  border-color: #c0392b #3d0000 #3d0000 #c0392b;
+  padding: 0.5rem 1.1rem;
+  cursor: none;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.coroner-download-btn:hover {
+  background: #c0392b;
+  color: #fff;
+}
+
+/* ── Section wrapper ────────────────────────────────────────────────────────── */
+.coroner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.coroner-panel-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: #444;
+}
+
+/* ── Forensic report panel ──────────────────────────────────────────────────── */
+.coroner-report-panel {
+  background: #050505;
+  border: 1px solid;
+  border-color: #111 #383838 #383838 #111;
+  padding: 1.5rem;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.coroner-report-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #bbb;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  line-height: 1.75;
+}
+
+/* ── Chat history ───────────────────────────────────────────────────────────── */
+.coroner-chat-history {
+  background: #050505;
+  border: 1px solid;
+  border-color: #111 #383838 #383838 #111;
+  padding: 1.25rem 1.5rem;
+  min-height: 220px;
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.coroner-empty {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: #333;
+  letter-spacing: 0.06em;
+}
+
+.coroner-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.coroner-msg-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+
+.coroner-msg--assistant .coroner-msg-label {
+  color: #c0392b;
+}
+
+.coroner-msg--user .coroner-msg-label {
+  color: #555;
+}
+
+.coroner-msg-content {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #ccc;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.coroner-msg--user .coroner-msg-content {
+  color: #888;
+  padding-left: 0.75rem;
+  border-left: 2px solid #1a1a1a;
+}
+
+.coroner-thinking {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #c0392b;
+  animation: coroner-blink 0.9s step-start infinite;
+}
+
+@keyframes coroner-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Input row ──────────────────────────────────────────────────────────────── */
+.coroner-input-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.coroner-prompt-symbol {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #c0392b;
+  padding-top: 0.45rem;
+  flex-shrink: 0;
+}
+
+.coroner-input {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #fff;
+  background: #0a0a0a;
+  border: 2px solid;
+  border-color: #111 #484848 #484848 #111;
+  box-shadow: 2px 2px 0 #000;
+  background-image: radial-gradient(circle, #1a1a1a 1px, transparent 1px);
+  background-size: 4px 4px;
+  padding: 0.5rem 0.75rem;
+  resize: none;
+  outline: none;
+  transition: none;
+  cursor: none;
+}
+
+.coroner-input:focus {
+  border-color: #c0392b #3d0000 #3d0000 #c0392b;
+}
+
+.coroner-input::placeholder {
+  color: #333;
+}
+
+.coroner-input:disabled {
+  opacity: 0.5;
+}
+
+.coroner-send-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  background: #c0392b;
+  color: #fff;
+  border: 2px solid;
+  border-color: #e74c3c #7d1a1a #7d1a1a #e74c3c;
+  padding: 0.5rem 1.25rem;
+  cursor: none;
+  box-shadow: 2px 2px 0 #000;
+  align-self: flex-end;
+}
+
+.coroner-send-btn:hover:not(:disabled) {
+  background: #e74c3c;
+}
+
+.coroner-send-btn:disabled {
+  background: #1a1a1a;
+  color: #444;
+  border-color: #222 #333 #333 #222;
+  box-shadow: none;
+}
+
+/* ── Markdown Report Styling ────────────────────────────────────────────────── */
+.coroner-report-markdown {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+<<<<<<< HEAD
+  color: #ffffff;
+=======
+  color: #ddd;
+>>>>>>> f8d94fb95f7021c4fd3cecb856b1ca7c4f7ac031
+  line-height: 1.6;
+}
+
+.coroner-report-markdown h1,
+.coroner-report-markdown h2,
+.coroner-report-markdown h3,
+.coroner-report-markdown h4 {
+  color: #fff;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.25rem;
+}
+
+.coroner-report-markdown h1 {
+  font-size: 1.5rem;
+}
+
+.coroner-report-markdown h2 {
+  font-size: 1.3rem;
+}
+
+.coroner-report-markdown h3 {
+  font-size: 1.1rem;
+}
+
+.coroner-report-markdown p {
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown ul,
+.coroner-report-markdown ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown li {
+  margin-bottom: 0.25rem;
+}
+
+.coroner-report-markdown blockquote {
+  border-left: 3px solid #c0392b;
+  margin: 1rem 0;
+  padding-left: 1rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+.coroner-report-markdown code {
+  background: #1a1a1a;
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #e74c3c;
+}
+
+.coroner-report-markdown pre {
+  background: #111;
+  padding: 1rem;
+  border: 1px solid #333;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown pre code {
+  background: transparent;
+  color: #ddd;
+  padding: 0;
+  border-radius: 0;
+}
+
+.coroner-report-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown th,
+.coroner-report-markdown td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.coroner-report-markdown th {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* ── PDF Export Styles (applied by handleDownload via JS class swap) ────────────
+   The JS strips `.coroner-report-markdown` and applies `.pdf-report-body`.
+   Full scoped styles are injected inline; this block is a lightweight fallback
+   and serves as the canonical @media print override if ever needed.
+   ─────────────────────────────────────────────────────────────────────────── */
+.pdf-report-body {
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #111111;
+  line-height: 1.65;
+}
+
+/* @media print fallback — mirrors the JS-injected styles */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  .coroner-report-markdown,
+  .pdf-report-body {
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 13px;
+    color: #111111 !important;
+    background: #ffffff !important;
+    line-height: 1.65;
+  }
+
+  .coroner-report-markdown h1,
+  .coroner-report-markdown h2,
+  .coroner-report-markdown h3,
+  .pdf-report-body h1,
+  .pdf-report-body h2,
+  .pdf-report-body h3 {
+    color: #0a0a0a !important;
+    border-color: #c0392b !important;
+  }
+
+  .coroner-report-markdown table th,
+  .pdf-report-body th {
+    background: #0f0f0f !important;
+    color: #ffffff !important;
+    border-color: #0f0f0f !important;
+  }
+
+  .coroner-report-markdown table td,
+  .pdf-report-body td {
+    color: #111111 !important;
+    background: #ffffff !important;
+    border-color: #e0e0e0 !important;
+  }
+
+  .coroner-report-markdown code,
+  .pdf-report-body code {
+    background: #f0f0f0 !important;
+    color: #b91c1c !important;
+  }
+
+  .coroner-report-markdown pre,
+  .pdf-report-body pre {
+    background: #f5f5f5 !important;
+    border-color: #e0e0e0 !important;
+  }
+
+  /* Hide interactive UI elements from print */
+  .coroner-header,
+  .coroner-chat-history,
+  .coroner-input-row,
+  .coroner-panel-label {
+    display: none !important;
+  }
+}

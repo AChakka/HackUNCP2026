@@ -392,6 +392,73 @@
   color: #c0392b;
 }
 
+/* ── File list (multi-upload) ─────────────────────────────────── */
+.file-list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.file-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.file-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.file-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #1a1a1a;
+  background: rgba(255,255,255,0.01);
+}
+
+.file-exhibit-tag {
+  font-family: monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: #c0392b;
+  border: 1px solid #3d0000;
+  padding: 0.1rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.file-list-name {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.file-list-size {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.file-list-hint {
+  font-family: monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: #222;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
 /* Pipeline */
 .pipeline {
   display: flex;
@@ -444,6 +511,51 @@
   opacity: 0.15;
   cursor: none;
 }
+
+/* ── Investigation loading overlay ────────────────────────────── */
+.home-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0, 0, 0, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.home-loading-stages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.home-stage-row {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.home-stage-icon {
+  font-family: 'Courier New', monospace;
+  min-width: 2.2em;
+}
+
+.home-stage--done        { color: #444; }
+.home-stage--done   .home-stage-icon { color: #c0392b; }
+.home-stage--active      { color: #fff; }
+.home-stage--active .home-stage-icon { color: #c0392b; }
+.home-stage--pending     { color: #1f1f1f; }
 
 /* Footer */
 .footer {

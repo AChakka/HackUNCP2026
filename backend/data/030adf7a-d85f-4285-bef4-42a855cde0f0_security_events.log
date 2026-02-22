@@ -1,0 +1,38 @@
+2024-01-15 01:58:22 WARNING Microsoft-Windows-Security-Auditing: Audit Policy Change - System audit policy was changed by SYSTEM
+2024-01-15 02:00:01 INFO Microsoft-Windows-Security-Auditing: Logon - Account successfully logged on. Account: SYSTEM Logon Type: 5 (Service)
+2024-01-15 02:11:01 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: administrator Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:03 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: administrator Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:05 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: admin Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:07 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: admin Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:09 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:11 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:13 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:15 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:17 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:19 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:21 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:23 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:25 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:27 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:29 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:11:31 WARNING Microsoft-Windows-Security-Auditing: Logon Failure - Account: john.smith Source IP: 185.220.101.45 Failure Reason: Unknown username or bad password
+2024-01-15 02:12:19 INFO Microsoft-Windows-Security-Auditing: Logon Success - Account: john.smith Source IP: 185.220.101.45 Logon Type: 3 (Network)
+2024-01-15 02:12:24 WARNING Microsoft-Windows-Security-Auditing: Privilege Use - Special privileges assigned to new logon. Account: john.smith Privileges: SeDebugPrivilege SeTcbPrivilege SeBackupPrivilege
+2024-01-15 02:12:31 ERROR Microsoft-Windows-Sysmon: Process Create - Image: C:\ProgramData\Microsoft\svchost64.exe ParentImage: C:\Windows\System32\cmd.exe CommandLine: svchost64.exe -install User: john.smith
+2024-01-15 02:12:33 ERROR Microsoft-Windows-Sysmon: Registry Set Value - Image: C:\ProgramData\Microsoft\svchost64.exe TargetObject: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\WindowsUpdate Details: C:\ProgramData\Microsoft\svchost64.exe
+2024-01-15 02:12:35 ERROR Microsoft-Windows-Sysmon: Network Connect - Image: C:\ProgramData\Microsoft\svchost64.exe DestinationIp: 185.220.101.45 DestinationPort: 4444 Protocol: tcp
+2024-01-15 02:12:40 ERROR Microsoft-Windows-Sysmon: Network Connect - Image: C:\ProgramData\Microsoft\svchost64.exe DestinationIp: 92.118.160.12 DestinationPort: 443 Protocol: tcp
+2024-01-15 02:13:01 ERROR Microsoft-Windows-Security-Auditing: Object Access - File encryption started. Process: svchost64.exe Target: C:\Users\john.smith\Documents
+2024-01-15 02:13:05 ERROR Microsoft-Windows-Security-Auditing: Object Access - File encryption started. Process: svchost64.exe Target: C:\Users\john.smith\Desktop
+2024-01-15 02:13:07 ERROR Microsoft-Windows-Security-Auditing: Object Access - File encryption started. Process: svchost64.exe Target: C:\Users\Shared\Finance
+2024-01-15 02:13:10 ERROR Microsoft-Windows-Sysmon: Process Create - Image: C:\Windows\System32\vssadmin.exe CommandLine: vssadmin delete shadows /all /quiet User: john.smith
+2024-01-15 02:13:12 ERROR Microsoft-Windows-Sysmon: Process Create - Image: C:\Windows\System32\bcdedit.exe CommandLine: bcdedit /set {default} recoveryenabled No User: john.smith
+2024-01-15 02:13:14 ERROR Microsoft-Windows-Sysmon: Process Create - Image: C:\Windows\System32\net.exe CommandLine: net stop WinDefend User: john.smith
+2024-01-15 02:13:16 ERROR Microsoft-Windows-Sysmon: File Create - Image: C:\ProgramData\Microsoft\svchost64.exe TargetFilename: C:\Users\john.smith\Desktop\README_DECRYPT.txt
+2024-01-15 02:13:20 ERROR Microsoft-Windows-Sysmon: File Create - Image: C:\ProgramData\Microsoft\svchost64.exe TargetFilename: C:\Users\john.smith\Documents\README_DECRYPT.txt
+2024-01-15 02:14:00 WARNING Microsoft-Windows-Security-Auditing: Account Lockout - Account: alice Source: 45.33.32.156
+2024-01-15 02:14:05 WARNING Microsoft-Windows-Security-Auditing: Account Lockout - Account: devops Source: 45.33.32.156
+2024-01-15 08:30:12 INFO Microsoft-Windows-Security-Auditing: Logon Success - Account: alice Source IP: 10.0.0.5 Logon Type: 3 (Network)
+2024-01-15 09:00:01 INFO Microsoft-Windows-TaskScheduler: Task Registered - Task: \Microsoft\Windows\WindowsUpdate\svchost_update Registered by: SYSTEM
+2024-01-15 10:15:00 INFO Microsoft-Windows-Security-Auditing: Logon Success - Account: devops Source IP: 10.0.0.12 Logon Type: 3 (Network)
+2024-01-15 10:47:22 INFO Microsoft-Windows-Security-Auditing: Logoff - Account: devops
