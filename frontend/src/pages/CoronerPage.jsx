@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
 import './CoronerPage.css'
 
 const API = 'http://localhost:8002'
@@ -13,6 +17,7 @@ function CoronerPage() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const chatRef = useRef(null)
+  const reportRef = useRef(null)
 
   useEffect(() => {
     if (!session_id) navigate('/')
@@ -56,8 +61,46 @@ function CoronerPage() {
     }
   }
 
-  const handleDownload = () => {
-    window.open(`${API}/api/download-pdf/${session_id}`, '_blank')
+  const handleDownload = async () => {
+    if (!reportRef.current) return;
+    try {
+      const oldMaxHeight = reportRef.current.style.maxHeight;
+      const oldOverflow = reportRef.current.style.overflow;
+      reportRef.current.style.maxHeight = 'none';
+      reportRef.current.style.overflow = 'visible';
+
+      const canvas = await html2canvas(reportRef.current, { scale: 2, backgroundColor: '#050505' });
+      
+      reportRef.current.style.maxHeight = oldMaxHeight;
+      reportRef.current.style.overflow = oldOverflow;
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = pdfWidth / imgWidth;
+      
+      const scaledHeight = imgHeight * ratio;
+      let heightLeft = scaledHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position -= pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`coroner_report_${file_name || 'export'}.pdf`);
+    } catch (err) {
+      console.error("Failed to generate PDF", err);
+    }
   }
 
   if (!session_id) return null
@@ -79,8 +122,12 @@ function CoronerPage() {
       {/* ── Forensic report ──────────────────────────────────────────────── */}
       <div className="coroner-section">
         <div className="coroner-panel-label">[ FORENSIC REPORT ]</div>
-        <div className="coroner-report-panel">
-          <pre className="coroner-report-text">{report}</pre>
+        <div className="coroner-report-panel" ref={reportRef}>
+          <div className="coroner-report-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {report || ''}
+            </ReactMarkdown>
+          </div>
         </div>
       </div>
 

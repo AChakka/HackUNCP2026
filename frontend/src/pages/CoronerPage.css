@@ -227,3 +227,88 @@
   border-color: #222 #333 #333 #222;
   box-shadow: none;
 }
+
+/* ── Markdown Report Styling ────────────────────────────────────────────────── */
+.coroner-report-markdown {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #ddd;
+  line-height: 1.6;
+}
+
+.coroner-report-markdown h1,
+.coroner-report-markdown h2,
+.coroner-report-markdown h3,
+.coroner-report-markdown h4 {
+  color: #fff;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.25rem;
+}
+
+.coroner-report-markdown h1 { font-size: 1.5rem; }
+.coroner-report-markdown h2 { font-size: 1.3rem; }
+.coroner-report-markdown h3 { font-size: 1.1rem; }
+.coroner-report-markdown p {
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown ul,
+.coroner-report-markdown ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown li {
+  margin-bottom: 0.25rem;
+}
+
+.coroner-report-markdown blockquote {
+  border-left: 3px solid #c0392b;
+  margin: 1rem 0;
+  padding-left: 1rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+.coroner-report-markdown code {
+  background: #1a1a1a;
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #e74c3c;
+}
+
+.coroner-report-markdown pre {
+  background: #111;
+  padding: 1rem;
+  border: 1px solid #333;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown pre code {
+  background: transparent;
+  color: #ddd;
+  padding: 0;
+  border-radius: 0;
+}
+
+.coroner-report-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.coroner-report-markdown th,
+.coroner-report-markdown td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.coroner-report-markdown th {
+  background: #1a1a1a;
+  color: #fff;
+}
