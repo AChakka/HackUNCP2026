@@ -72,7 +72,7 @@ def get_transaction(signature, retries=2, backoff=0.5):
 def _fetch_all_transactions(signatures):
     """Fetch all transactions in parallel."""
     results = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         future_to_sig = {pool.submit(get_transaction, sig): sig for sig in signatures}
         for future in as_completed(future_to_sig):
             sig = future_to_sig[future]

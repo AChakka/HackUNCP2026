@@ -1,3 +1,5 @@
+import time
+
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -18,7 +20,7 @@ app.add_middleware(
 
 class TraceReq(BaseModel):
     wallet: str
-    limit: int = 20
+    limit: int = 5
 
 
 class ReportReq(BaseModel):
@@ -53,20 +55,74 @@ def report(req: ReportReq):
     profile = profile_wallet(req.wallet, limit=req.limit)
     score, label, flags, wallet_type = classify_wallet(profile)
 
+    now = int(time.time())
+    txc = profile.get("tx_count", 0)
+    unique = profile.get("unique_counterparties", 0)
+    newest_ts = profile.get("newest_timestamp")
+    oldest_ts = profile.get("oldest_timestamp")
+    time_spread = profile.get("time_spread_seconds")
     top = profile.get("top_counterparties", [])[:5]
-    top_str = (
-        ", ".join([f"{t['wallet'][:6]}... ({t['count']} tx)" for t in top])
-        if top else "none identified"
-    )
+
+    # Last seen
+    if newest_ts:
+        days_ago = (now - newest_ts) / 86400
+        if days_ago < 1:
+            last_seen = "last active within the past 24 hours"
+        elif days_ago < 7:
+            last_seen = f"last active {int(days_ago)} day(s) ago"
+        else:
+            last_seen = f"last active {int(days_ago)} days ago"
+    else:
+        last_seen = "activity timestamp unavailable"
+
+    # Wallet age
+    if oldest_ts:
+        age_days = (now - oldest_ts) / 86400
+        age_str = f"{int(age_days)} days" if age_days >= 1 else "less than 1 day"
+        age_ctx = f"On-chain history in this sample spans {age_str}."
+    else:
+        age_ctx = ""
+
+    # Activity density
+    if time_spread and time_spread > 0 and txc > 1:
+        rate = txc / max(time_spread / 3600, 0.01)
+        if rate > 10:
+            density = "extremely high frequency (>10 tx/hr)"
+        elif rate > 1:
+            density = f"~{rate:.1f} tx/hr"
+        else:
+            density = f"~{(txc / max(time_spread / 86400, 0.01)):.1f} tx/day"
+        density_ctx = f"Transaction rate in sampled window: {density}."
+    else:
+        density_ctx = ""
+
+    # Repeat vs scatter
+    if top:
+        max_count = top[0]["count"]
+        if max_count >= 3:
+            repeat_ctx = f"Top counterparty interacted {max_count}x — repeated contact suggests ongoing relationship."
+        elif all(c["count"] == 1 for c in top):
+            repeat_ctx = "All counterparties contacted exactly once — no repeated relationships in this sample."
+        else:
+            repeat_ctx = ""
+    else:
+        repeat_ctx = "No counterparty data available."
+
+    # Clean verdict
+    if not flags:
+        verdict = "No suspicious indicators detected in this sample. Consistent with ordinary user behavior."
+    elif label == "HIGH":
+        verdict = "Multiple high-risk indicators present. This wallet warrants further manual review."
+    elif label == "MEDIUM":
+        verdict = "Elevated risk indicators detected. Treat as a person of interest pending further evidence."
+    else:
+        verdict = "Low-risk profile based on available data. No strong indicators of illicit activity."
 
     summary = (
-        f"Wallet {req.wallet[:6]}... recorded {profile.get('tx_count', 0)} transactions "
-        f"across {profile.get('unique_counterparties', 0)} unique counterparties in the sampled window. "
-        f"Top counterparties: {top_str}. "
-        f"Risk assessment: {label} (score {score}/100). "
-        f"Behavioral classification: {wallet_type}. "
-        f"Active flags: {', '.join(flags) if flags else 'none'}."
-    )
+        f"Sample of {txc} transaction(s) from wallet {req.wallet[:8]}... — {last_seen}. "
+        f"Identified {unique} unique counterpart wallet(s) after filtering known infrastructure. "
+        f"{age_ctx} {density_ctx} {repeat_ctx} {verdict}"
+    ).strip()
 
     return {
         "wallet": req.wallet,
@@ -96,9 +152,9 @@ async def scan_file(file: UploadFile = File(...)):
         return {"found": 0, "results": []}
 
     results = []
-    for wallet in wallets[:10]:  # cap at 10 to avoid timeout
+    for wallet in wallets[:5]:  # cap at 5, 3 tx each to stay under rate limits
         try:
-            profile = profile_wallet(wallet, limit=10)
+            profile = profile_wallet(wallet, limit=3)
             score, label, flags, wallet_type = classify_wallet(profile)
             results.append({
                 "wallet": wallet,
