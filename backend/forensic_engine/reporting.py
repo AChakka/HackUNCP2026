@@ -40,8 +40,19 @@ def generate_pdf(report_text: str, file_name: str, output_path: str) -> str:
     pdf.set_text_color(30, 30, 30)
     pdf.set_font("Courier", "", 8)
 
+    def to_latin1(text):
+        """Replace characters outside Latin-1 so built-in Courier font can render them."""
+        replacements = {
+            '\u2019': "'", '\u2018': "'", '\u201c': '"', '\u201d': '"',
+            '\u2013': '-', '\u2014': '--', '\u2022': '*', '\u2026': '...',
+            '\u00b7': '*', '\u2192': '->', '\u2190': '<-', '\u2248': '~=',
+        }
+        for ch, rep in replacements.items():
+            text = text.replace(ch, rep)
+        return text.encode('latin-1', errors='replace').decode('latin-1')
+
     for line in report_text.split("\n"):
-        stripped = line.rstrip()
+        stripped = to_latin1(line.rstrip())
         if stripped.startswith("## "):
             pdf.ln(3)
             pdf.set_font("Courier", "B", 10)
