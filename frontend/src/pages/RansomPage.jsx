@@ -15,6 +15,81 @@ const DIALECT_FLAG = {
   us: '🇺🇸', gb: '🇬🇧', au: '🇦🇺', ie: '🇮🇪', in: '🇮🇳',
 }
 
+const GROUP_PROFILES = {
+  BTCWare: {
+    active:   '2017 – 2018',
+    origin:   'Eastern Europe',
+    type:     'Targeted / RDP',
+    targets:  'Individuals, SMBs',
+    demand:   'Low (~$500 USD)',
+    summary:  'Spread primarily through brute-forced RDP sessions. Known for appending extensions like .btcware, .cryptobyte, and .theva. Operators typically negotiated directly with victims via email, keeping ransoms low to maximise payment rates.',
+    tags:     ['RDP Brute Force', 'Low Volume', 'Direct Negotiation'],
+  },
+  Cerber: {
+    active:   '2016 – 2017',
+    origin:   'Russian-speaking group',
+    type:     'RaaS Platform',
+    targets:  'Enterprise, Office 365 users',
+    demand:   '~1 BTC',
+    summary:  'One of the first major Ransomware-as-a-Service platforms. Notorious for audio ransom notes that read the demand aloud. Distributed through exploit kits and malspam. Affiliates kept 60–70% of proceeds, making it one of the most prolific families of its era.',
+    tags:     ['RaaS', 'Audio Note', 'Exploit Kit', 'Necurs'],
+  },
+  Dharma: {
+    active:   '2016 – present',
+    origin:   'Iran (suspected)',
+    type:     'Targeted / RDP',
+    targets:  'Windows servers, healthcare, finance',
+    demand:   '$1,000 – $5,000',
+    summary:  'One of the longest-running ransomware families. Compromises exposed RDP ports, often using stolen credentials. Appends the victim\'s ID and contact email to each encrypted file. Variants include .cezar, .java, .bip, and hundreds more. Frequently updated to evade detection.',
+    tags:     ['RDP', 'Long-Running', 'ID-Based Extension', 'Iran'],
+  },
+  GandCrab: {
+    active:   '2018 – 2019',
+    origin:   'Russian-speaking group (CIS)',
+    type:     'RaaS Platform',
+    targets:  'Broad — individuals to enterprise',
+    demand:   '$400 – $700,000',
+    summary:  'Operated as a RaaS and claimed to have generated over $2 billion before the operators "retired" in mid-2019. Distributed via exploit kits, malspam, and compromised RDP. Ran five major versions (v1–v5.2), each with improved evasion. The successor lineage became REvil.',
+    tags:     ['RaaS', 'Exploit Kit', 'REvil Precursor', 'CIS'],
+  },
+  GlobeImposter: {
+    active:   '2017 – 2019',
+    origin:   'Unknown',
+    type:     'Spam / RDP',
+    targets:  'Healthcare, government',
+    demand:   '$1,000 – $10,000',
+    summary:  'Designed to impersonate the Globe ransomware family. Spread via spam campaigns and compromised RDP. Known for targeting hospitals and government agencies with extensions like .doc, .crypt, and .btc. Multiple versioned waves were released throughout its active period.',
+    tags:     ['Healthcare Target', 'Globe Impersonation', 'RDP', 'Malspam'],
+  },
+  JAFF: {
+    active:   '2017 (short-lived)',
+    origin:   'Unknown (Necurs affiliates)',
+    type:     'Mass Spam Campaign',
+    targets:  'Broad consumer and corporate',
+    demand:   '~2 BTC (~$4,000 at peak)',
+    summary:  'Delivered in massive waves by the Necurs botnet through malicious PDF attachments containing embedded Word documents with macros. Despite short operational lifespan, JAFF was one of the highest-volume campaigns of 2017. Decryptor was later released after C2 infrastructure was analysed.',
+    tags:     ['Necurs Botnet', 'PDF Malspam', 'High Volume', 'Short-Lived'],
+  },
+  Locky: {
+    active:   '2016 – 2017',
+    origin:   'Russian-speaking group',
+    type:     'Mass Spam / Botnet',
+    targets:  'Healthcare, enterprise, consumers',
+    demand:   '0.5 – 1 BTC',
+    summary:  'One of the largest ransomware campaigns in history, distributed by the Necurs botnet at peak volumes of hundreds of millions of emails per day. Used Office macros and JS downloaders. Released under many extension variants (.locky, .zepto, .odin, .thor, .shit). Targeted healthcare systems globally.',
+    tags:     ['Necurs Botnet', 'Healthcare', 'Massive Scale', 'Office Macros'],
+  },
+  TeslaCrypt: {
+    active:   '2015 – 2016',
+    origin:   'Unknown',
+    type:     'Consumer / Gamer Target',
+    targets:  'Gamers, then broad consumers',
+    demand:   '$250 – $500 USD',
+    summary:  'Initially designed to encrypt video game save files and progress data (Steam, Minecraft, Call of Duty). Later expanded to general file encryption. Notably, the operators shut down voluntarily in May 2016 and publicly released the master decryption key — allowing all victims to recover files for free.',
+    tags:     ['Gamer Target', 'Master Key Released', 'Voluntarily Shut Down'],
+  },
+}
+
 const SAMPLE_NOTE = `ATTENTION! All of your important files have been encrypted!
 Your documents, photos, databases, and other critical data are no longer accessible.
 
@@ -105,7 +180,7 @@ const NEGOTIATION_COLOR = {
 function AiCard({ ai }) {
   if (!ai || ai.error) return (
     <section className="rp-card">
-      <p className="rp-card-tag">// AI THREAT INTELLIGENCE //</p>
+      <p className="rp-card-tag">// ML THREAT INTELLIGENCE //</p>
       <p className="rp-kw-none">{ai?.error ?? 'No AI analysis available'}</p>
     </section>
   )
@@ -115,7 +190,7 @@ function AiCard({ ai }) {
 
   return (
     <section className="rp-card">
-      <p className="rp-card-tag">// AI THREAT INTELLIGENCE //</p>
+      <p className="rp-card-tag">// ML THREAT INTELLIGENCE //</p>
 
       <div className="rp-ai-grid">
 
@@ -188,15 +263,41 @@ function ResultPanel({ data }) {
 
       {/* ── Family ─────────────────────────────────────────── */}
       <section className="rp-card">
-        <p className="rp-card-tag">// RANSOMWARE FAMILY //</p>
-        <div className="rp-top-match">
-          <span className="rp-top-name">{family.top}</span>
-          <span className="rp-top-conf">{Math.round(family.confidence * 100)}% MATCH</span>
-        </div>
-        <div className="rp-bars">
-          {Object.entries(family.all_scores).map(([cls, score]) => (
-            <ConfBar key={cls} label={cls} value={score} highlight={cls === family.top} />
-          ))}
+        <p className="rp-card-tag">// RANSOMWARE FAMILY — ML MODEL //</p>
+        <div className="rp-family-layout">
+          <div className="rp-family-left">
+            <div className="rp-top-match">
+              <span className="rp-top-name">{family.top}</span>
+              <span className="rp-top-conf">{Math.round(family.confidence * 100)}% MATCH</span>
+            </div>
+            <div className="rp-bars">
+              {Object.entries(family.all_scores).map(([cls, score]) => (
+                <ConfBar key={cls} label={cls} value={score} highlight={cls === family.top} />
+              ))}
+            </div>
+          </div>
+          {GROUP_PROFILES[family.top] && (
+            <div className="rp-family-right">
+              {(() => {
+                const p = GROUP_PROFILES[family.top]
+                return (
+                  <>
+                    <div className="rp-gp-meta">
+                      <div className="rp-gp-row"><span className="rp-gp-key">ACTIVE</span><span className="rp-gp-val">{p.active}</span></div>
+                      <div className="rp-gp-row"><span className="rp-gp-key">ORIGIN</span><span className="rp-gp-val">{p.origin}</span></div>
+                      <div className="rp-gp-row"><span className="rp-gp-key">TYPE</span><span className="rp-gp-val">{p.type}</span></div>
+                      <div className="rp-gp-row"><span className="rp-gp-key">TARGETS</span><span className="rp-gp-val">{p.targets}</span></div>
+                      <div className="rp-gp-row"><span className="rp-gp-key">DEMAND</span><span className="rp-gp-val rp-gp-val--red">{p.demand}</span></div>
+                    </div>
+                    <p className="rp-gp-summary">{p.summary}</p>
+                    <div className="rp-gp-tags">
+                      {p.tags.map(t => <span key={t} className="rp-gp-tag">{t}</span>)}
+                    </div>
+                  </>
+                )
+              })()}
+            </div>
+          )}
         </div>
       </section>
 
