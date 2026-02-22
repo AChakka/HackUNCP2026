@@ -292,10 +292,14 @@ export default function CryptoPage() {
 }
 
 function RiskBadge({ label, score }) {
+  const color = RISK_COLOR[label] ?? '#444'
   return (
-    <div className="risk-badge" style={{ borderColor: RISK_COLOR[label] ?? '#444', color: RISK_COLOR[label] ?? '#444' }}>
+    <div className="risk-badge" style={{ borderColor: color, color }}>
       <span className="risk-label">{label}</span>
       <span className="risk-score">{score}/100</span>
+      <div className="risk-bar-track">
+        <div className="risk-bar-fill" style={{ width: `${score}%`, background: color }} />
+      </div>
     </div>
   )
 }
@@ -406,7 +410,7 @@ function TraceGraph({ wallet }) {
 }
 
 function WalletReport({ data }) {
-  const { wallet, summary, risk, profile } = data
+  const { wallet, summary, risk, profile, balance_sol } = data
   return (
     <div className="result-panel">
       <p className="result-section-label">// INVESTIGATION REPORT //</p>
@@ -416,6 +420,12 @@ function WalletReport({ data }) {
           <p className="report-wallet-label">SUBJECT WALLET</p>
           <p className="report-wallet">{wallet}</p>
           <p className="report-type">{risk.wallet_type}</p>
+          {balance_sol != null && (
+            <p className="report-balance">
+              <span className="balance-label">BALANCE</span>
+              <span className="balance-value">{balance_sol} SOL</span>
+            </p>
+          )}
         </div>
         <RiskBadge label={risk.label} score={risk.score} />
       </div>
@@ -429,7 +439,7 @@ function WalletReport({ data }) {
         <div className="report-flags">
           <p className="result-section-label">// FLAGS //</p>
           {risk.flags.map((f, i) => (
-            <p key={i} className="flag-item">&#x25A0; {f}</p>
+            <p key={i} className="flag-item">{f}</p>
           ))}
         </div>
       )}

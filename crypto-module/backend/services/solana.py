@@ -26,6 +26,23 @@ def _looks_like_program(addr: str) -> bool:
     return addr in KNOWN_PROGRAMS
 
 
+def get_balance(wallet):
+    """Return current SOL balance as a float (converts from lamports)."""
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getBalance",
+        "params": [wallet],
+    }
+    try:
+        r = requests.post(SOLANA_RPC, json=payload, timeout=5)
+        r.raise_for_status()
+        lamports = r.json().get("result", {}).get("value", 0)
+        return round(lamports / 1_000_000_000, 4)
+    except Exception:
+        return None
+
+
 def get_signatures(wallet, limit=5):
     payload = {
         "jsonrpc": "2.0",
@@ -102,10 +119,12 @@ def _extract_accounts(tx_result):
 
 
 def profile_wallet(wallet, limit=5):
+    balance_sol = get_balance(wallet)
     sigs = get_signatures(wallet, limit)
     if not sigs:
         return {
             "wallet": wallet,
+            "balance_sol": balance_sol,
             "tx_count": 0,
             "recent_transactions": [],
             "unique_counterparties": 0,
@@ -146,6 +165,7 @@ def profile_wallet(wallet, limit=5):
 
     return {
         "wallet": wallet,
+        "balance_sol": balance_sol,
         "tx_count": len(recent_transactions),
         "recent_transactions": recent_transactions,
         "unique_counterparties": len(counterparty_counts),

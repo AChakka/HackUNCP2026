@@ -126,6 +126,7 @@ def report(req: ReportReq):
 
     return {
         "wallet": req.wallet,
+        "balance_sol": profile.get("balance_sol"),
         "summary": summary,
         "risk": {
             "score": score,
