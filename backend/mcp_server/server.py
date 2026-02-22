@@ -21,30 +21,6 @@ def verify_file_integrity(path: str) -> str:
     except Exception as e:
         return f"Hashing error: {e}"
 
-# ==========================================
-# TOOL 2: TIMELINE ANALYSIS
-# ==========================================
-@mcp.tool()
-def get_file_timeline(path: str) -> str:
-    """Retrieves MAC (Modified, Accessed, Created) timestamps for a file."""
-    try:
-        import timestamps
-        return timestamps.get_mac_times(path)
-    except ImportError:
-        return "System Note: The 'timestamps' module is not yet online."
-
-# ==========================================
-# TOOL 3: MALWARE STRINGS EXTRACTION
-# ==========================================
-@mcp.tool()
-def extract_suspicious_strings(path: str) -> str:
-    """Extracts human-readable text from compiled binaries to find IPs or URLs."""
-    try:
-        import strings_analysis
-        return strings_analysis.extract_strings(path)
-    except ImportError:
-        return "System Note: The 'strings_analysis' module is not yet online."
-
 
 if __name__ == "__main__":
     mcp.run()
