@@ -16,9 +16,9 @@
 }
 
 .rp-ascii {
-  font-size: 0.55rem;
+  font-size: 0.42rem;
   line-height: 1.15;
-  color: #c0392b;
+  color: #fff;
   white-space: pre;
   overflow-x: auto;
   margin: 0 0 1.2rem;

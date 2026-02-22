@@ -10,9 +10,9 @@
   position: fixed;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-4px, -4px);
-  width: 96px;
-  height: 96px;
+  transform: translate(-10px, -10px);
+  width: 52px;
+  height: 52px;
   image-rendering: pixelated;
 }
 

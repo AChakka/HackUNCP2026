@@ -38,7 +38,7 @@ function Header() {
         <nav className="nav">
           <Link to="/" className={location.pathname === '/' ? 'nav-active' : ''}>Home</Link>
           <Link to="/crypto" className={location.pathname === '/crypto' ? 'nav-active' : ''}>Crypto Trace</Link>
-          <Link to="/ransom" className={location.pathname === '/ransom' ? 'nav-active' : ''}>Profiler</Link>
+          <Link to="/ransom" className={location.pathname === '/ransom' ? 'nav-active' : ''}>Digital Sketch</Link>
           <a href="#">TBD</a>
         </nav>
       </div>
