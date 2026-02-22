@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-02-22T08:16:56Z",
+  "type": "tfidf + linearSVC + calibrated",
+  "labels": [
+    "BTCWare",
+    "Cerber",
+    "Dharma",
+    "GandCrab",
+    "GlobeImposter",
+    "JAFF",
+    "Locky",
+    "TeslaCrypt"
+  ],
+  "min_samples_filter": 5
+}
