@@ -89,35 +89,39 @@ class ForensicSession:
         
         prompt = (
             f"You are an elite Digital Forensics and Incident Response (DFIR) Agent. "
-            f"Your task is to perform a comprehensive, multi-stage forensic analysis on the following batch of files:\n{file_list_str}\n\n"
-            
-            "You are connected to an MCP server with access to specialized tools. "
-            "You MUST follow this exact Standard Operating Procedure (SOP) FOR EACH FILE sequentially. Do not skip steps, and do not ask me for permission to proceed.\n\n"
-            
-            "CRITICAL RULE: If a tool fails, returns an error, or gives you the exact same output twice, DO NOT retry it. "
-            "Note the failure in your timeline and immediately proceed to the next step for that file.\n\n"
-            
+            f"Your task is to perform a comprehensive, multi-stage forensic analysis on this batch of evidence:\n{file_list_str}\n\n"
+
+            "You are connected to an MCP server. You MUST follow this SOP for EACH file. "
+            "CRITICAL: If a tool fails or repeats, log the 'Tool Failure' and pivot immediately. No retries.\n\n"
+
             "### PHASE 1: Triaging & Artifact Extraction\n"
-            "1. CALL 'extract_file_metadata' to pull robust intelligence: MAC timestamps, MIME types, EXIF, and extension mismatches.\n"
-            "2. CALL 'parse_log_file' if the file is a text log to hunt for brute force or suspicious events.\n"
-            "3. CALL 'analyze_stego' if the file is an image (.jpg, .png) to check for embedded payloads.\n\n"
-            
-            "### PHASE 2: Static Analysis & Reputation Triage\n"
-            "4. CALL 'analyze_entropy' to check if the file is a packed executable (PE).\n"
-            "5. CALL 'lookup_file_hash' to see if Hybrid Analysis already has a report on this file.\n"
-            "6. CALL 'scan_with_virustotal' to check its reputation across AV engines.\n\n"
-            
-            "### PHASE 3: Dynamic Execution (Sandbox)\n"
-            "7. CALL 'submit_to_sandbox' to upload the file for behavioral analysis.\n"
-            "8. Using the Job ID from the previous step, CALL 'get_sandbox_report' to retrieve the execution results. "
-            "(Note: If the report says it is still processing, wait a moment and try again if your tool loop allows, or note it in the final report).\n\n"
-            
-            "### PHASE 4: Incident Context & Reporting\n"
-            "9. Once all individual files have been processed, CALL 'build_incident_timeline' using the list of ALL target file paths to build a master timeline.\n"
-            "10. CALL 'export_timeline_csv' to save the compiled timeline data for the evidence locker.\n\n"
-            
-            "Once you have successfully executed all available tools for all files and gathered the overall evidence, generate a highly detailed final 'DFIR Master Executive Report'. "
-            "Include definitive verdicts per file (Malicious, Suspicious, or Benign), a holistic view of the attack simulation based on the combination of behaviors, and the synthesized timeline of events."
+            "1. CALL 'extract_file_metadata' for MAC timestamps, MIME, and extension mismatches.\n"
+            "2. CALL 'parse_log_file' for text logs (search for brute force/lateral movement).\n"
+            "3. CALL 'analyze_stego' for images (search for hidden C2 configs or payloads).\n\n"
+
+            "### PHASE 2: Static Analysis & Reputation\n"
+            "4. CALL 'analyze_entropy' to detect packing/obfuscation.\n"
+            "5. CALL 'lookup_file_hash' to query Hybrid Analysis history.\n"
+            "6. CALL 'scan_with_virustotal' for global AV reputation.\n\n"
+
+            "### PHASE 3: Dynamic Execution\n"
+            "7. CALL 'submit_to_sandbox' for behavioral detonation.\n"
+            "8. CALL 'get_sandbox_report' using the Job ID. (If processing, log status and move on).\n\n"
+
+            "### PHASE 4: Correlation & Incident Synthesis\n"
+            "9. After individual processing, CALL 'build_incident_timeline' using ALL file paths.\n"
+            "10. ANALYZE RELATIONSHIPS: Compare findings across all files. Identify if File A dropped File B, "
+            "or if multiple files share a Command & Control (C2) IP or suspicious timestamp window.\n"
+            "11. CALL 'export_timeline_csv' for the evidence locker.\n\n"
+
+            "### FINAL OUTPUT: DFIR MASTER EXECUTIVE REPORT\n"
+            "Once tools are exhausted, generate an extensive report with these sections:\n"
+            "1. EXECUTIVE SUMMARY: A high-level narrative of the 'Infection Lifecycle'. How did the attack start and evolve?\n"
+            "2. FINDINGS MATRIX: A table including File Name, Verdict (Malicious/Suspicious/Benign), Malware Family, and Confidence Score (1-10).\n"
+            "3. CROSS-FILE CORRELATION: Detail how these files interact (e.g., 'The log in File A confirms the execution of the PE in File B').\n"
+            "4. ATTACK KILL CHAIN: Map all artifacts to relevant MITRE ATT&CK techniques.\n"
+            "5. REMEDIATION: Specific steps to neutralize this specific threat cluster.\n"
+            "6. SYNTHESIZED TIMELINE: A chronological master sequence of the entire incident."
         )
         
         self.messages.append({"role": "user", "content": prompt})
