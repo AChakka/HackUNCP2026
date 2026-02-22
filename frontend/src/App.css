@@ -445,6 +445,51 @@
   cursor: none;
 }
 
+/* ── Investigation loading overlay ────────────────────────────── */
+.home-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0, 0, 0, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.home-loading-stages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.home-stage-row {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.home-stage-icon {
+  font-family: 'Courier New', monospace;
+  min-width: 2.2em;
+}
+
+.home-stage--done        { color: #444; }
+.home-stage--done   .home-stage-icon { color: #c0392b; }
+.home-stage--active      { color: #fff; }
+.home-stage--active .home-stage-icon { color: #c0392b; }
+.home-stage--pending     { color: #1f1f1f; }
+
 /* Footer */
 .footer {
   text-align: center;

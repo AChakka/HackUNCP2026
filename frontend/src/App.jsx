@@ -1,10 +1,69 @@
 import { useState, useRef, useEffect } from 'react'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import bloodImg from './assets/9gtem78jepmgj4390oifvtpo12.png'
 import cursorImg from './assets/7qm8h0d555imegvquob85gn0ve.png'
 import CryptoPage from './pages/CryptoPage.jsx'
 import RansomPage from './pages/RansomPage.jsx'
+import CoronerPage from './pages/CoronerPage.jsx'
+
+const INVESTIGATION_STAGES = [
+  'FILE INTAKE',
+  'TOOL DISPATCH',
+  'AI ANALYSIS',
+  'SYNTHESIS',
+  'GENERATING REPORT',
+]
+
+function InvestigationOverlay({ currentStage }) {
+  const total = INVESTIGATION_STAGES.length
+  const r = 78
+  const circumference = 2 * Math.PI * r
+  const filled = currentStage >= 0 ? (currentStage / (total - 1)) * circumference : 0
+  const offset = circumference - filled
+
+  return (
+    <div className="home-loading-overlay">
+      <div className="home-loading-center">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r={r} fill="none" stroke="#1a1a1a" strokeWidth="6" />
+          <circle
+            cx="100" cy="100" r={r}
+            fill="none"
+            stroke="#c0392b"
+            strokeWidth="6"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="square"
+            transform="rotate(-90 100 100)"
+            style={{ transition: 'stroke-dashoffset 0.9s ease' }}
+          />
+          <text x="100" y="95" textAnchor="middle" fill="#fff"
+            fontFamily="monospace" fontSize="11" letterSpacing="2">
+            CORONER
+          </text>
+          <text x="100" y="114" textAnchor="middle" fill="#c0392b"
+            fontFamily="monospace" fontSize="8" letterSpacing="1">
+            {currentStage >= 0 ? INVESTIGATION_STAGES[currentStage] : ''}
+          </text>
+        </svg>
+
+        <ul className="home-loading-stages">
+          {INVESTIGATION_STAGES.map((s, i) => {
+            const done   = i < currentStage
+            const active = i === currentStage
+            return (
+              <li key={i} className={`home-stage-row ${done ? 'home-stage--done' : active ? 'home-stage--active' : 'home-stage--pending'}`}>
+                <span className="home-stage-icon">{done ? '[X]' : active ? '[>]' : '[ ]'}</span>
+                {s}
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </div>
+  )
+}
 
 function Cursor() {
   const [pos, setPos] = useState({ x: -200, y: -200 })
@@ -39,7 +98,7 @@ function Header() {
           <Link to="/" className={location.pathname === '/' ? 'nav-active' : ''}>Home</Link>
           <Link to="/crypto" className={location.pathname === '/crypto' ? 'nav-active' : ''}>Crypto Trace</Link>
           <Link to="/ransom" className={location.pathname === '/ransom' ? 'nav-active' : ''}>Digital Sketch</Link>
-          <a href="#">TBD</a>
+          <Link to="/coroner" className={location.pathname === '/coroner' ? 'nav-active' : ''}>Coroner</Link>
         </nav>
       </div>
     </header>
@@ -49,7 +108,11 @@ function Header() {
 function HomePage() {
   const [dragOver, setDragOver] = useState(false)
   const [file, setFile] = useState(null)
+  const [investigating, setInvestigating] = useState(false)
+  const [currentStage, setCurrentStage] = useState(-1)
   const inputRef = useRef(null)
+  const stageTimerRef = useRef(null)
+  const navigate = useNavigate()
 
   const handleDrop = (e) => {
     e.preventDefault()
@@ -70,9 +133,47 @@ function HomePage() {
     if (selected) setFile(selected)
   }
 
-  const handleAnalyze = () => {
-    // TODO: send file to MCP backend
-    console.log('Analyzing:', file)
+  const handleAnalyze = async () => {
+    if (!file || investigating) return
+    setInvestigating(true)
+    setCurrentStage(0)
+
+    // Tick through stages while waiting for the API
+    let stage = 0
+    stageTimerRef.current = setInterval(() => {
+      stage = Math.min(stage + 1, INVESTIGATION_STAGES.length - 2)
+      setCurrentStage(stage)
+    }, 4500)
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await fetch('http://localhost:8002/api/start-investigation', {
+        method: 'POST',
+        body: formData,
+      })
+      clearInterval(stageTimerRef.current)
+      setCurrentStage(INVESTIGATION_STAGES.length - 1)
+
+      if (!res.ok) throw new Error('Investigation failed')
+      const data = await res.json()
+
+      setTimeout(() => {
+        navigate('/coroner', {
+          state: {
+            session_id: data.session_id,
+            report: data.report,
+            file_name: data.file_name,
+          },
+        })
+      }, 600)
+    } catch (err) {
+      clearInterval(stageTimerRef.current)
+      console.error(err)
+      setInvestigating(false)
+      setCurrentStage(-1)
+    }
   }
 
   const handleClear = () => {
@@ -82,6 +183,8 @@ function HomePage() {
 
   return (
     <main className="main">
+      {investigating && <InvestigationOverlay currentStage={currentStage} />}
+
       <div className="hero">
         <div className="ascii-wrap">
           <img src={bloodImg} className="blood-bg" alt="" aria-hidden="true" />
@@ -96,7 +199,7 @@ function HomePage() {
 ░ ░          ░ ░     ░         ░ ░           ░    ░  ░   ░
 ░                                                              `}</pre>
         </div>
-        <p className="hero-sub">TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD</p>
+        <p className="hero-sub">Upload any file for full forensic AI analysis — entropy, AV scanning, metadata extraction, timeline reconstruction.</p>
       </div>
 
       <div
@@ -141,7 +244,7 @@ function HomePage() {
       </div>
 
       <div className="pipeline">
-        {['TBD', 'TBD', 'TBD', 'TBD', 'TBD'].map((label, i) => (
+        {['FILE INTAKE', 'TOOL DISPATCH', 'AI ANALYSIS', 'SYNTHESIS', 'CORONER'].map((label, i) => (
           <div key={i} className="pipeline-step">
             <span className="step-label">{label}</span>
             {i < 4 && <span className="step-arrow">-&gt;</span>}
@@ -149,8 +252,8 @@ function HomePage() {
         ))}
       </div>
 
-      <button className="analyze-btn" disabled={!file} onClick={handleAnalyze}>
-        TBD
+      <button className="analyze-btn" disabled={!file || investigating} onClick={handleAnalyze}>
+        BEGIN INVESTIGATION
       </button>
     </main>
   )
@@ -172,6 +275,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/crypto" element={<CryptoPage />} />
         <Route path="/ransom" element={<RansomPage />} />
+        <Route path="/coroner" element={<CoronerPage />} />
       </Routes>
 
       <footer className="footer">
