@@ -20,6 +20,7 @@ from forensic_engine.api_enrichment import (
     save_timeline_tool
 )
 from forensic_engine.virustotal import virustotal_scan
+from forensic_engine.steganography import analyze_steganography
 
 def register_forensic_tools(mcp):
     """
