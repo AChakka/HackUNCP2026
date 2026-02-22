@@ -107,7 +107,7 @@ function Header() {
 
 function HomePage() {
   const [dragOver, setDragOver] = useState(false)
-  const [file, setFile] = useState(null)
+  const [files, setFiles] = useState([])
   const [investigating, setInvestigating] = useState(false)
   const [currentStage, setCurrentStage] = useState(-1)
   const inputRef = useRef(null)
@@ -117,8 +117,8 @@ function HomePage() {
   const handleDrop = (e) => {
     e.preventDefault()
     setDragOver(false)
-    const dropped = e.dataTransfer.files[0]
-    if (dropped) setFile(dropped)
+    const dropped = Array.from(e.dataTransfer.files)
+    if (dropped.length) setFiles(prev => [...prev, ...dropped])
   }
 
   const handleDragOver = (e) => {
@@ -129,12 +129,15 @@ function HomePage() {
   const handleDragLeave = () => setDragOver(false)
 
   const handleFileInput = (e) => {
-    const selected = e.target.files[0]
-    if (selected) setFile(selected)
+    const selected = Array.from(e.target.files)
+    if (selected.length) setFiles(prev => [...prev, ...selected])
+    inputRef.current.value = ''
   }
 
+  const removeFile = (idx) => setFiles(prev => prev.filter((_, i) => i !== idx))
+
   const handleAnalyze = async () => {
-    if (!file || investigating) return
+    if (!files.length || investigating) return
     setInvestigating(true)
     setCurrentStage(0)
 
@@ -146,7 +149,7 @@ function HomePage() {
     }, 4500)
 
     const formData = new FormData()
-    formData.append('file', file)
+    files.forEach(f => formData.append('files', f))
 
     try {
       const res = await fetch('http://localhost:8002/api/start-investigation', {
@@ -177,7 +180,7 @@ function HomePage() {
   }
 
   const handleClear = () => {
-    setFile(null)
+    setFiles([])
     if (inputRef.current) inputRef.current.value = ''
   }
 
@@ -203,15 +206,15 @@ function HomePage() {
       </div>
 
       <div
-        className={`dropzone ${dragOver ? 'dragover' : ''} ${file ? 'has-file' : ''}`}
+        className={`dropzone ${dragOver ? 'dragover' : ''} ${files.length ? 'has-file' : ''}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => !file && inputRef.current.click()}
+        onClick={() => inputRef.current.click()}
       >
-        <input ref={inputRef} type="file" hidden onChange={handleFileInput} />
+        <input ref={inputRef} type="file" multiple hidden onChange={handleFileInput} />
 
-        {!file ? (
+        {files.length === 0 ? (
           <div className="drop-content">
             <p className="drop-tag">// EVIDENCE INTAKE //</p>
             <div className="drop-icon">
@@ -220,25 +223,26 @@ function HomePage() {
               </svg>
             </div>
             <p className="drop-primary">DROP EVIDENCE HERE</p>
-            <p className="drop-secondary">disk images / memory dumps / raw files</p>
+            <p className="drop-secondary">disk images / memory dumps / log files / raw files</p>
             <p className="drop-secondary">_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _</p>
           </div>
         ) : (
-          <div className="file-preview">
-            <div className="file-meta-tag">EXHIBIT A</div>
-            <div className="file-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-                <line x1="8" y1="17" x2="16" y2="17"/>
-              </svg>
+          <div className="file-list-preview">
+            <div className="file-list-header">
+              <span className="file-meta-tag">{files.length} FILE{files.length > 1 ? 'S' : ''} QUEUED</span>
+              <button className="clear-btn" onClick={(e) => { e.stopPropagation(); handleClear() }}>CLEAR ALL</button>
             </div>
-            <div className="file-info">
-              <p className="file-name">{file.name}</p>
-              <p className="file-size">{(file.size / 1024 / 1024).toFixed(2)} MB &nbsp;|&nbsp; PENDING ANALYSIS</p>
+            <div className="file-list-items">
+              {files.map((f, i) => (
+                <div key={i} className="file-list-row">
+                  <span className="file-exhibit-tag">EX-{i + 1}</span>
+                  <span className="file-list-name">{f.name}</span>
+                  <span className="file-list-size">{(f.size / 1024 / 1024).toFixed(2)} MB</span>
+                  <button className="clear-btn" onClick={(e) => { e.stopPropagation(); removeFile(i) }}>×</button>
+                </div>
+              ))}
             </div>
-            <button className="clear-btn" onClick={(e) => { e.stopPropagation(); handleClear() }}>x</button>
+            <p className="file-list-hint">// CLICK OR DROP TO ADD MORE //</p>
           </div>
         )}
       </div>
@@ -252,7 +256,7 @@ function HomePage() {
         ))}
       </div>
 
-      <button className="analyze-btn" disabled={!file || investigating} onClick={handleAnalyze}>
+      <button className="analyze-btn" disabled={!files.length || investigating} onClick={handleAnalyze}>
         BEGIN INVESTIGATION
       </button>
     </main>

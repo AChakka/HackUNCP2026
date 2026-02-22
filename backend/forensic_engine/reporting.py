@@ -51,19 +51,26 @@ def generate_pdf(report_text: str, file_name: str, output_path: str) -> str:
             text = text.replace(ch, rep)
         return text.encode('latin-1', errors='replace').decode('latin-1')
 
+    w = pdf.epw  # effective page width — always safe
+
     for line in report_text.split("\n"):
         stripped = to_latin1(line.rstrip())
+        pdf.set_x(pdf.l_margin)  # reset cursor X before every cell
         if stripped.startswith("## "):
             pdf.ln(3)
             pdf.set_font("Courier", "B", 10)
             pdf.set_text_color(192, 57, 43)
-            pdf.multi_cell(0, 6, stripped[3:])
+            pdf.set_x(pdf.l_margin)
+            pdf.multi_cell(w, 6, stripped[3:])
             pdf.set_font("Courier", "", 8)
             pdf.set_text_color(30, 30, 30)
         elif stripped == "":
             pdf.ln(3)
         else:
-            pdf.multi_cell(0, 5, stripped)
+            try:
+                pdf.multi_cell(w, 5, stripped)
+            except Exception:
+                pass  # skip any line that still can't render
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     pdf.output(output_path)

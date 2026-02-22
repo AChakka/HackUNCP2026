@@ -392,6 +392,73 @@
   color: #c0392b;
 }
 
+/* ── File list (multi-upload) ─────────────────────────────────── */
+.file-list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.file-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.file-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.file-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #1a1a1a;
+  background: rgba(255,255,255,0.01);
+}
+
+.file-exhibit-tag {
+  font-family: monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: #c0392b;
+  border: 1px solid #3d0000;
+  padding: 0.1rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.file-list-name {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.file-list-size {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.file-list-hint {
+  font-family: monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: #222;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
 /* Pipeline */
 .pipeline {
   display: flex;
