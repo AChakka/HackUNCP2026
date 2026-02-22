@@ -61,7 +61,7 @@ def virustotal_scan(file_path: str) -> dict:
     analysis_id = upload_resp.json()["data"]["id"]
 
     # Step 4: Poll until the scan completes (VT scans asynchronously)
-    for _ in range(12):  # up to ~60 seconds
+    for _ in range(36):  # up to ~3 minutes
         time.sleep(5)
         poll_resp = requests.get(
             f"{VT_BASE}/analyses/{analysis_id}",
@@ -72,10 +72,11 @@ def virustotal_scan(file_path: str) -> dict:
             continue
 
         if poll_resp.json()["data"]["attributes"]["status"] == "completed":
+            # Give VT a moment to propagate the completed analysis to the /files endpoint
+            time.sleep(2)
             file_resp = requests.get(f"{VT_BASE}/files/{sha256}", headers=headers, timeout=10)
             if file_resp.status_code == 200:
                 return _parse_response(file_resp.json(), source="fresh_scan", sha256=sha256)
-            break
 
     return {
         "error": "Scan timed out. The file may still be processing on VirusTotal.",

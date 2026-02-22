@@ -42,12 +42,6 @@ def register_forensic_tools(mcp):
         try:
             result = analyze_pe_file(file_path)
             return json.dumps(result, indent=2)
-        # 2. ADD THIS BLOCK: Gracefully catch non-executable files
-        except pefile.PEFormatError:
-            return json.dumps({
-                "status": "skipped", 
-                "message": "The file is not a valid PE (Portable Executable) binary (missing DOS header). It is likely a script or plain text file. Entropy analysis skipped."
-            }, indent=2)
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Entropy analysis failed: {str(e)}"})
 

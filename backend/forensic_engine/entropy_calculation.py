@@ -37,36 +37,48 @@ def get_risk_level(entropy: float) -> str:
 
 def analyze_pe_file(file_path: str) -> dict:
     """
-    Parse a PE file and calculate entropy for each section.
+    Calculate overall file entropy and, if it is a PE file, calculate entropy for each section.
     Returns a dictionary of the analysis results.
     """
     result = {
         "file": file_path,
         "status": "success",
+        "overall_entropy": 0.0,
+        "overall_risk_level": "Unknown",
+        "is_pe_file": False,
         "sections": [],
         "error": None
     }
     
     try:
         with open(file_path, "rb") as bf:
-            header = bf.read(2)
-            if header != b"MZ":
-                result["status"] = "skipped"
-                result["error"] = f"'{file_path}' is not a valid PE file (missing MZ header). Skipping entropy calculation."
-                return result
+            file_data = bf.read()
+            
+        if not file_data:
+            result["overall_risk_level"] = "Low (Empty File)"
+            return result
+            
+        # 1. Calculate overall file entropy (Useful for ALL file types including PDFs)
+        overall_ent = calculate_entropy(file_data)
+        result["overall_entropy"] = round(overall_ent, 4)
+        result["overall_risk_level"] = get_risk_level(overall_ent)
+        
+        # 2. Check if it's a PE file
+        if not file_data.startswith(b"MZ"):
+            result["is_pe_file"] = False
+            return result
+            
+        result["is_pe_file"] = True
 
-        # pefile.PE will read the file in binary mode
+        # 3. If it is a PE file, calculate section-by-section entropy
         try:
-            pe = pefile.PE(file_path)
+            pe = pefile.PE(data=file_data)
         except pefile.PEFormatError as e:
-            result["status"] = "error"
-            result["error"] = f"'{file_path}' is not a valid PE (Portable Executable) file. ({e})"
+            result["error"] = f"File has MZ header but is not a valid PE. ({e})"
             return result
             
         for section in pe.sections:
-            # Decode section name and remove null bytes
             section_name = section.Name.decode('utf-8', errors='ignore').rstrip('\x00')
-            # Extract the raw bytes of the section
             section_data = section.get_data()
             
             if not section_data:
