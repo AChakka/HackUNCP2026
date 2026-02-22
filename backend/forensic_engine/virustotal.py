@@ -3,9 +3,11 @@ import hashlib
 import os
 import time
 import requests
+from dotenv import load_dotenv
 
+load_dotenv()
 VT_BASE = "https://www.virustotal.com/api/v3"
-VIRUSTOTAL_API_KEY = VIRUSTOTAL_API_KEY
+VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY",'')
 
 
 # ── Main tool function ─────────────────────────────────────────────────────────
