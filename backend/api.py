@@ -259,23 +259,29 @@ async def run_agent(messages: list, max_rounds: int = 10) -> str:
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 @app.post("/api/start-investigation")
-async def start_investigation(file: UploadFile = File(...)):
+async def start_investigation(files: list[UploadFile] = File(...)):
     session_id = str(uuid.uuid4())
 
-    safe_name = file.filename.replace("/", "_").replace("\\", "_")
-    file_path = os.path.join(DATA_DIR, f"{session_id}_{safe_name}")
-    with open(file_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+    file_paths, file_names = [], []
+    for file in files:
+        safe_name = file.filename.replace("/", "_").replace("\\", "_")
+        file_path = os.path.join(DATA_DIR, f"{session_id}_{safe_name}")
+        with open(file_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+        file_paths.append(file_path)
+        file_names.append(file.filename)
+
+    combined_name = ", ".join(file_names)
+    paths_block = "\n".join(f"  - {p} (original: {n})" for p, n in zip(file_paths, file_names))
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {
             "role": "user",
             "content": (
-                f"Begin a full forensic investigation.\n"
-                f"File path: {file_path}\n"
-                f"Original file name: {file.filename}\n\n"
-                "Run all appropriate tools and produce your complete structured report."
+                f"Begin a full forensic investigation on {len(file_paths)} file(s).\n"
+                f"File paths:\n{paths_block}\n\n"
+                "Run all appropriate tools against each file and produce your complete structured report."
             ),
         },
     ]
@@ -283,8 +289,9 @@ async def start_investigation(file: UploadFile = File(...)):
     report_text = await run_agent(messages)
 
     SESSIONS[session_id] = {
-        "file_path": file_path,
-        "file_name": file.filename,
+        "file_paths": file_paths,
+        "file_path": file_paths[0],
+        "file_name": combined_name,
         "messages": messages,
         "report": report_text,
         "pdf_path": None,
@@ -294,7 +301,7 @@ async def start_investigation(file: UploadFile = File(...)):
     return {
         "session_id": session_id,
         "report": report_text,
-        "file_name": file.filename,
+        "file_name": combined_name,
     }
 
 
