@@ -63,78 +63,212 @@ function CoronerPage() {
 
   const handleDownload = async () => {
     if (!reportRef.current) return;
+
+    const FOOTER_TEXT = 'HackUNCP 2026 \u2014 Confidential Report';
+    const generatedAt = new Date().toLocaleString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+
     try {
       setLoading(true);
-      // 1. Create a hidden clone to apply universal design styles independently of dark mode
-      const clone = reportRef.current.cloneNode(true);
 
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      clone.style.top = '0';
-      clone.style.width = '800px';
-      clone.style.backgroundColor = '#ffffff';
-      clone.style.color = '#111827';
-      clone.style.maxHeight = 'none';
-      clone.style.overflow = 'visible';
+      // ── 1. Build off-screen styled wrapper ──────────────────────────────────
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = [
+        'position:absolute', 'left:-9999px', 'top:0',
+        'width:900px', 'background:#ffffff', 'color:#111827',
+        'font-family:Inter,Roboto,Helvetica,Arial,sans-serif',
+        'font-size:14px', 'line-height:1.6',
+        'padding:48px 56px', 'box-sizing:border-box',
+        'max-height:none', 'overflow:visible',
+      ].join(';');
 
-      clone.classList.add('pdf-export-clone');
-      document.body.appendChild(clone);
+      // ── 2. Inject scoped CSS ─────────────────────────────────────────────────
+      const style = document.createElement('style');
+      style.textContent = `
+        .pdf-doc * { box-sizing: border-box; }
 
-      // 2. Capture canvas with forced white background
-      const canvas = await html2canvas(clone, {
+        .pdf-header { margin-bottom: 28px; }
+        .pdf-title {
+          font-size: 24px; font-weight: 700; color: #0f172a;
+          margin: 0 0 6px 0; letter-spacing: -0.5px;
+        }
+        .pdf-meta {
+          font-size: 11px; color: #64748b; margin: 0 0 20px 0;
+          text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .pdf-divider {
+          border: none; border-top: 2px solid #e2e8f0; margin: 0 0 32px 0;
+        }
+
+        .pdf-doc p {
+          margin: 0 0 14px 0;
+          break-inside: avoid; page-break-inside: avoid;
+        }
+
+        .pdf-doc h1 {
+          font-size: 22px; font-weight: 700; color: #0f172a;
+          margin: 36px 0 12px; padding-bottom: 8px;
+          border-bottom: 2px solid #cbd5e1;
+          break-after: avoid; page-break-after: avoid;
+        }
+        .pdf-doc h2 {
+          font-size: 18px; font-weight: 700; color: #1e293b;
+          margin: 28px 0 10px;
+          break-after: avoid; page-break-after: avoid;
+        }
+        .pdf-doc h3 {
+          font-size: 15px; font-weight: 600; color: #334155;
+          margin: 22px 0 8px;
+          break-after: avoid; page-break-after: avoid;
+        }
+
+        .pdf-doc ul, .pdf-doc ol { margin: 0 0 14px 24px; padding: 0; }
+        .pdf-doc li { margin-bottom: 4px; }
+
+        .pdf-doc blockquote {
+          margin: 16px 0; padding: 12px 16px;
+          border-left: 4px solid #94a3b8;
+          background: #f8fafc; color: #475569; font-style: italic;
+          border-radius: 0 4px 4px 0;
+          break-inside: avoid; page-break-inside: avoid;
+        }
+        .pdf-doc blockquote p { margin: 0; }
+
+        .pdf-doc code {
+          font-family: 'Courier New', Courier, monospace;
+          font-size: 12px; background: #f1f5f9; color: #b91c1c;
+          padding: 2px 5px; border-radius: 3px;
+          white-space: pre-wrap; word-break: break-all;
+        }
+        .pdf-doc pre {
+          background: #f1f5f9; border: 1px solid #e2e8f0;
+          border-radius: 6px; padding: 14px 16px; margin: 0 0 16px;
+          overflow: visible;
+          break-inside: avoid; page-break-inside: avoid;
+        }
+        .pdf-doc pre code {
+          background: transparent; color: #1e293b;
+          padding: 0; border-radius: 0;
+          white-space: pre-wrap; word-break: break-all; font-size: 12px;
+        }
+
+        .pdf-doc table {
+          width: 100%; border-collapse: collapse; margin: 0 0 20px;
+          font-size: 13px;
+          break-inside: avoid; page-break-inside: avoid;
+        }
+        .pdf-doc th {
+          background: #1e293b; color: #f8fafc; padding: 9px 12px;
+          text-align: left; font-weight: 600; font-size: 12px;
+          text-transform: uppercase; letter-spacing: 0.05em;
+          border-bottom: 2px solid #0f172a;
+        }
+        .pdf-doc td {
+          padding: 8px 12px; border-bottom: 1px solid #e2e8f0;
+          vertical-align: top; color: #1e293b;
+        }
+        .pdf-doc tbody tr:nth-child(even) td { background: #f8fafc; }
+        .pdf-doc tbody tr:last-child td { border-bottom: none; }
+
+        .pdf-doc img {
+          max-width: 100%; height: auto;
+          break-inside: avoid; page-break-inside: avoid;
+        }
+      `;
+      wrapper.appendChild(style);
+
+      // ── 3. Formal document header ────────────────────────────────────────────
+      const header = document.createElement('div');
+      header.className = 'pdf-header';
+      header.innerHTML = `
+        <p class="pdf-title">DFIR Master Executive Report</p>
+        <p class="pdf-meta">File: ${file_name || 'Unknown'} &nbsp;|&nbsp; Generated: ${generatedAt}</p>
+        <hr class="pdf-divider" />
+      `;
+      wrapper.appendChild(header);
+
+      // ── 4. Clone and inject markdown content ─────────────────────────────────
+      const content = reportRef.current.cloneNode(true);
+      content.className = 'pdf-doc';
+      // Strip dark-mode inline styles so our scoped CSS wins
+      content.removeAttribute('style');
+      wrapper.appendChild(content);
+
+      document.body.appendChild(wrapper);
+
+      // Small pause so fonts/layout settle
+      await new Promise(r => setTimeout(r, 150));
+
+      // ── 5. Capture the wrapper ───────────────────────────────────────────────
+      const canvas = await html2canvas(wrapper, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 900,
       });
 
-      document.body.removeChild(clone);
+      document.body.removeChild(wrapper);
 
-      // 3. Setup standard A4 document
+      // ── 6. Build A4 PDF with margins and per-page footers ────────────────────
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20; // 20mm uniform margin (~0.8 inches)
+      const marginX = 14;
+      const marginTop = 14;
+      const footerH = 8;
+      const marginBot = 5;
 
-      const contentWidth = pdfWidth - (margin * 2);
-      const contentHeight = pdfHeight - (margin * 2);
+      const contentWidth = pdfWidth - marginX * 2;
+      const contentHeight = pdfHeight - marginTop - footerH - marginBot;
 
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-
-      const ratio = contentWidth / imgWidth;
-      const scaledHeight = imgHeight * ratio;
+      const ratio = contentWidth / canvas.width;
+      const scaledHeight = canvas.height * ratio;
 
       let heightLeft = scaledHeight;
-      let position = margin;
+      let yPos = marginTop;
+      let pageNum = 1;
 
-      // 4. Print first page
-      pdf.addImage(imgData, 'PNG', margin, position, contentWidth, scaledHeight);
+      const addFooter = (doc, pg) => {
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        const fy = pdfHeight - marginBot;
+        doc.text(FOOTER_TEXT, marginX, fy);
+        const pgLabel = `Page ${pg}`;
+        doc.text(pgLabel, pdfWidth - marginX - doc.getTextWidth(pgLabel), fy);
+        doc.setDrawColor(210, 210, 210);
+        doc.line(marginX, fy - 2.5, pdfWidth - marginX, fy - 2.5);
+        doc.setTextColor(0, 0, 0);
+        doc.setDrawColor(0, 0, 0);
+      };
+
+      // First page
+      pdf.addImage(imgData, 'PNG', marginX, yPos, contentWidth, scaledHeight);
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, pdfHeight - footerH - marginBot, pdfWidth, footerH + marginBot, 'F');
+      addFooter(pdf, pageNum);
       heightLeft -= contentHeight;
 
-      // Mask bottom margin to prevent image bleed
-      pdf.setFillColor(255, 255, 255);
-      pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
-
-      // 5. Handle subsequent pages
+      // Subsequent pages
       while (heightLeft > 0) {
+        pageNum++;
         pdf.addPage();
-        position -= contentHeight;
-        pdf.addImage(imgData, 'PNG', margin, position, contentWidth, scaledHeight);
-
-        // Mask top and bottom margins for a clean professional look
+        yPos -= contentHeight;
+        pdf.addImage(imgData, 'PNG', marginX, yPos, contentWidth, scaledHeight);
         pdf.setFillColor(255, 255, 255);
-        pdf.rect(0, 0, pdfWidth, margin, 'F');
-        pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
-
+        pdf.rect(0, 0, pdfWidth, marginTop, 'F');
+        pdf.rect(0, pdfHeight - footerH - marginBot, pdfWidth, footerH + marginBot, 'F');
+        addFooter(pdf, pageNum);
         heightLeft -= contentHeight;
       }
 
       pdf.save(`coroner_report_${file_name || 'export'}.pdf`);
     } catch (err) {
-      console.error("Failed to generate PDF", err);
+      console.error('Failed to generate PDF', err);
     } finally {
       setLoading(false);
     }
