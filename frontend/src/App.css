@@ -145,6 +145,10 @@
   color: #c0392b;
 }
 
+.nav-active {
+  color: #fff !important;
+}
+
 /* Main */
 .main {
   flex: 1;
