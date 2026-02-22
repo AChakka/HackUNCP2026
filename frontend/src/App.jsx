@@ -37,12 +37,13 @@ function App() {
 
   return (
     <div className="app">
+
       {/* Header */}
       <header className="header">
         <div className="header-inner">
           <div className="logo-area">
             <div className="logo-placeholder" />
-            <span className="logo-text">TBD</span>
+            <span className="logo-text">CORONER</span>
           </div>
           <nav className="nav">
             <a href="#">TBD</a>
@@ -56,10 +57,16 @@ function App() {
       {/* Hero */}
       <main className="main">
         <div className="hero">
-          <p className="hero-tag">TBD</p>
-          <h1 className="hero-title">
-            TBD <span className="accent">TBD</span>
-          </h1>
+          <pre className="ascii-logo">{` ▄████▄   ▒█████   ██▀███   ▒█████   ███▄    █ ▓█████  ██▀███
+▒██▀ ▀█  ▒██▒  ██▒▓██ ▒ ██▒▒██▒  ██▒ ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒
+▒▓█    ▄ ▒██░  ██▒▓██ ░▄█ ▒▒██░  ██▒▓██  ▀█ ██▒▒███   ▓██ ░▄█ ▒
+▒▓▓▄ ▄██▒▒██   ██░▒██▀▀█▄  ▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄ ▒██▀▀█▄
+▒ ▓███▀ ░░ ████▓▒░░██▓ ▒██▒░ ████▓▒░▒██░   ▓██░░▒████▒░██▓ ▒██▒
+░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒▓ ░▒▓░░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒▓ ░▒▓░
+  ░  ▒     ░ ▒ ▒░   ░▒ ░ ▒░  ░ ▒ ▒░ ░ ░░   ░ ▒░ ░ ░  ░  ░▒ ░ ▒░
+░        ░ ░ ░ ▒    ░░   ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░░   ░
+░ ░          ░ ░     ░         ░ ░           ░    ░  ░   ░
+░                                                              `}</pre>
           <p className="hero-sub">TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD</p>
         </div>
 
@@ -71,17 +78,12 @@ function App() {
           onDragLeave={handleDragLeave}
           onClick={() => !file && inputRef.current.click()}
         >
-          <input
-            ref={inputRef}
-            type="file"
-            hidden
-            onChange={handleFileInput}
-          />
+          <input ref={inputRef} type="file" hidden onChange={handleFileInput} />
 
           {!file ? (
             <div className="drop-content">
               <div className="drop-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
@@ -93,7 +95,7 @@ function App() {
           ) : (
             <div className="file-preview">
               <div className="file-icon">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
@@ -107,7 +109,7 @@ function App() {
           )}
         </div>
 
-        {/* Pipeline Preview */}
+        {/* Pipeline */}
         <div className="pipeline">
           {['TBD', 'TBD', 'TBD', 'TBD', 'TBD'].map((label, i) => (
             <div key={i} className="pipeline-step">
@@ -118,11 +120,7 @@ function App() {
         </div>
 
         {/* CTA */}
-        <button
-          className="analyze-btn"
-          disabled={!file}
-          onClick={handleAnalyze}
-        >
+        <button className="analyze-btn" disabled={!file} onClick={handleAnalyze}>
           TBD
         </button>
       </main>
