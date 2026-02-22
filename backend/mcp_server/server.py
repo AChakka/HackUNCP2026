@@ -45,17 +45,6 @@ def extract_suspicious_strings(path: str) -> str:
     except ImportError:
         return "System Note: The 'strings_analysis' module is not yet online."
 
-# ==========================================
-# TOOL 4: SYSTEM PROCESSES
-# ==========================================
-@mcp.tool()
-def check_active_processes() -> str:
-    """Retrieves a list of currently running processes to look for malware."""
-    try:
-        import system_forensics
-        return system_forensics.get_running_processes()
-    except ImportError:
-        return "System Note: The 'system_forensics' module is not yet online."
 
 if __name__ == "__main__":
     mcp.run()
