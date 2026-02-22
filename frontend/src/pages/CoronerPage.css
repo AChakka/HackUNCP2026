@@ -82,7 +82,7 @@
 .coroner-report-text {
   font-family: 'Courier New', monospace;
   font-size: 0.78rem;
-  color: #aa9898;
+  color: #bbb;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
@@ -239,7 +239,11 @@
 .coroner-report-markdown {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
+<<<<<<< HEAD
   color: #ffffff;
+=======
+  color: #ddd;
+>>>>>>> f8d94fb95f7021c4fd3cecb856b1ca7c4f7ac031
   line-height: 1.6;
 }
 
@@ -329,56 +333,74 @@
   color: #fff;
 }
 
-/* ── PDF Export Clone Styling (Universal Design) ──────────────────────────────── */
-.pdf-export-clone {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  padding: 1rem !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-  font-size: 14px !important;
+/* ── PDF Export Styles (applied by handleDownload via JS class swap) ────────────
+   The JS strips `.coroner-report-markdown` and applies `.pdf-report-body`.
+   Full scoped styles are injected inline; this block is a lightweight fallback
+   and serves as the canonical @media print override if ever needed.
+   ─────────────────────────────────────────────────────────────────────────── */
+.pdf-report-body {
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #111111;
+  line-height: 1.65;
 }
 
-.pdf-export-clone .coroner-report-markdown {
-  font-family: inherit !important;
-  color: #111827 !important;
-}
+/* @media print fallback — mirrors the JS-injected styles */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
 
-.pdf-export-clone * {
-  color: #111827 !important;
-  border-color: #e5e7eb !important;
-}
+  .coroner-report-markdown,
+  .pdf-report-body {
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 13px;
+    color: #111111 !important;
+    background: #ffffff !important;
+    line-height: 1.65;
+  }
 
-.pdf-export-clone h1,
-.pdf-export-clone h2,
-.pdf-export-clone h3,
-.pdf-export-clone h4 {
-  color: #000000 !important;
-  border-bottom-color: #e5e7eb !important;
-  margin-top: 1rem !important;
-}
+  .coroner-report-markdown h1,
+  .coroner-report-markdown h2,
+  .coroner-report-markdown h3,
+  .pdf-report-body h1,
+  .pdf-report-body h2,
+  .pdf-report-body h3 {
+    color: #0a0a0a !important;
+    border-color: #c0392b !important;
+  }
 
-.pdf-export-clone blockquote {
-  border-left-color: #6b7280 !important;
-  color: #4b5563 !important;
-  background: #f9fafb !important;
-}
+  .coroner-report-markdown table th,
+  .pdf-report-body th {
+    background: #0f0f0f !important;
+    color: #ffffff !important;
+    border-color: #0f0f0f !important;
+  }
 
-.pdf-export-clone pre {
-  background: #f3f4f6 !important;
-  border: 1px solid #d1d5db !important;
-}
+  .coroner-report-markdown table td,
+  .pdf-report-body td {
+    color: #111111 !important;
+    background: #ffffff !important;
+    border-color: #e0e0e0 !important;
+  }
 
-.pdf-export-clone code {
-  background: #f3f4f6 !important;
-  color: #b91c1c !important;
-}
+  .coroner-report-markdown code,
+  .pdf-report-body code {
+    background: #f0f0f0 !important;
+    color: #b91c1c !important;
+  }
 
-.pdf-export-clone th {
-  background: #f9fafb !important;
-  color: #111827 !important;
-  border: 1px solid #d1d5db !important;
-}
+  .coroner-report-markdown pre,
+  .pdf-report-body pre {
+    background: #f5f5f5 !important;
+    border-color: #e0e0e0 !important;
+  }
 
-.pdf-export-clone td {
-  border: 1px solid #d1d5db !important;
+  /* Hide interactive UI elements from print */
+  .coroner-header,
+  .coroner-chat-history,
+  .coroner-input-row,
+  .coroner-panel-label {
+    display: none !important;
+  }
 }
