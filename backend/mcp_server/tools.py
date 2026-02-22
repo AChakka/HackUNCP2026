@@ -2,8 +2,6 @@ import sys
 import os
 import json
 from typing import List, Dict
-
-# 1. ADD THIS IMPORT: We need it to catch the specific PE error
 import pefile
 
 # Ensure the backend directory is in the path for clean imports
@@ -23,37 +21,35 @@ from forensic_engine.api_enrichment import (
     save_timeline_tool
 )
 from forensic_engine.virustotal import virustotal_scan
+from forensic_engine.log_parser import parse_log
 
 def register_forensic_tools(mcp):
     """
     Registers the full suite of forensic analysis tools with the FastMCP instance.
+    Includes Static Analysis, Sandboxing, Reputation checks, and Log Parsing.
     """
     
-    # --- STATIC ANALYSIS ---
+    # --- 1. STATIC ANALYSIS & ENTROPY ---
     @mcp.tool()
     async def analyze_entropy(file_path: str) -> str:
         """
-        Calculates Shannon Entropy for PE file sections. 
-        High entropy (>7.0) often indicates packed or encrypted malware.
+        Calculates Shannon Entropy for file sections and the overall file. 
+        Works on ANY file type. High entropy (>7.0) often indicates packed 
+        malware or encrypted data.
         """
         try:
+            # The updated analyze_pe_file handles its own errors and fallbacks
             result = analyze_pe_file(file_path)
             return json.dumps(result, indent=2)
-        # 2. ADD THIS BLOCK: Gracefully catch non-executable files
-        except pefile.PEFormatError:
-            return json.dumps({
-                "status": "skipped", 
-                "message": "The file is not a valid PE (Portable Executable) binary (missing DOS header). It is likely a script or plain text file. Entropy analysis skipped."
-            }, indent=2)
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Entropy analysis failed: {str(e)}"})
 
-    # --- MULTI-ENGINE SCANNING (VirusTotal) ---
+    # --- 2. MULTI-ENGINE REPUTATION (VirusTotal) ---
     @mcp.tool()
     async def scan_with_virustotal(file_path: str) -> str:
         """
         Scans a file against 70+ AV engines via VirusTotal. 
-        Handles hashing, cache-checking, and file uploading automatically.
+        Handles hashing and file uploading automatically.
         """
         try:
             result = await virustotal_scan(file_path)
@@ -61,7 +57,7 @@ def register_forensic_tools(mcp):
         except Exception as e:
             return json.dumps({"status": "error", "error": f"VirusTotal scan failed: {str(e)}"})
 
-    # --- REPUTATION & SANDBOXING (Hybrid Analysis) ---
+    # --- 3. DYNAMIC ANALYSIS & SANDBOXING (Hybrid Analysis) ---
     @mcp.tool()
     async def lookup_file_hash(sha256: str) -> str:
         """
@@ -89,7 +85,7 @@ def register_forensic_tools(mcp):
     @mcp.tool()
     async def get_sandbox_report(job_id: str) -> str:
         """
-        Retrieves the behavioral analysis report from a sandbox run using its Job ID.
+        Retrieves the behavioral analysis summary from a sandbox run using its Job ID.
         """
         try:
             result = hybrid_analysis_report(job_id)
@@ -97,12 +93,26 @@ def register_forensic_tools(mcp):
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Report retrieval failed: {str(e)}"})
 
-    # --- TIMELINE & METADATA ---
+    # --- 4. LOG ANALYSIS TOOL ---
+    @mcp.tool()
+    async def analyze_log_file(file_path: str, max_lines: int = 2000) -> str:
+        """
+        Parse a log file (auth.log, syslog, nginx, Apache, or Windows events).
+        Extracts IPs, usernames, failed/successful logins, and flags brute force attacks.
+        """
+        try:
+            # parse_log is async, so we await the results
+            result = await parse_log(file_path, max_lines)
+            return json.dumps(result, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "error": f"Log parsing failed: {str(e)}"})
+
+    # --- 5. TIMELINE & METADATA ---
     @mcp.tool()
     async def get_file_timestamps(file_path: str) -> str:
         """
         Extracts MACB (Modified, Accessed, Created, Birth) timestamps from a file.
-        Essential for detecting timestomping and file creation windows.
+        Essential for detecting timestomping.
         """
         try:
             result = file_timestamps_tool(file_path)
