@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import './App.css'
+import bloodImg from './assets/9gtem78jepmgj4390oifvtpo12.png'
 
 function App() {
   const [dragOver, setDragOver] = useState(false)
@@ -57,6 +58,8 @@ function App() {
       {/* Hero */}
       <main className="main">
         <div className="hero">
+          <div className="ascii-wrap">
+            <img src={bloodImg} className="blood-bg" alt="" aria-hidden="true" />
           <pre className="ascii-logo">{` ▄████▄   ▒█████   ██▀███   ▒█████   ███▄    █ ▓█████  ██▀███
 ▒██▀ ▀█  ▒██▒  ██▒▓██ ▒ ██▒▒██▒  ██▒ ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒
 ▒▓█    ▄ ▒██░  ██▒▓██ ░▄█ ▒▒██░  ██▒▓██  ▀█ ██▒▒███   ▓██ ░▄█ ▒
@@ -67,6 +70,7 @@ function App() {
 ░        ░ ░ ░ ▒    ░░   ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░░   ░
 ░ ░          ░ ░     ░         ░ ░           ░    ░  ░   ░
 ░                                                              `}</pre>
+          </div>
           <p className="hero-sub">TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD</p>
         </div>
 
