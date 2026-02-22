@@ -87,8 +87,96 @@ function ConfBar({ label, value, highlight }) {
 
 // ── Result panel ───────────────────────────────────────────────────────────
 
+const SOPHISTICATION_COLOR = {
+  'Script Kiddie': '#444',
+  'Low':           '#555',
+  'Medium':        '#b8860b',
+  'High':          '#c0392b',
+  'Nation-State':  '#8b0000',
+}
+
+const NEGOTIATION_COLOR = {
+  'Very Likely':    '#1a6b3c',
+  'Likely':         '#2e7d52',
+  'Unlikely':       '#b8860b',
+  'Non-Negotiable': '#c0392b',
+}
+
+function AiCard({ ai }) {
+  if (!ai || ai.error) return (
+    <section className="rp-card">
+      <p className="rp-card-tag">// AI THREAT INTELLIGENCE //</p>
+      <p className="rp-kw-none">{ai?.error ?? 'No AI analysis available'}</p>
+    </section>
+  )
+
+  const sophColor = SOPHISTICATION_COLOR[ai.sophistication] ?? '#555'
+  const negColor  = NEGOTIATION_COLOR[ai.negotiation_likelihood] ?? '#555'
+
+  return (
+    <section className="rp-card">
+      <p className="rp-card-tag">// AI THREAT INTELLIGENCE //</p>
+
+      <div className="rp-ai-grid">
+
+        <div className="rp-ai-cell">
+          <p className="rp-ai-label">KNOWN GROUP RESEMBLANCE</p>
+          <p className="rp-ai-value rp-ai-value--accent">{ai.known_group_resemblance ?? '—'}</p>
+          {ai.confidence_note && <p className="rp-ai-note">{ai.confidence_note}</p>}
+        </div>
+
+        <div className="rp-ai-cell">
+          <p className="rp-ai-label">ACTOR PROFILE</p>
+          <p className="rp-ai-value">{ai.threat_actor_profile ?? '—'}</p>
+        </div>
+
+        <div className="rp-ai-cell rp-ai-cell--half">
+          <p className="rp-ai-label">SOPHISTICATION</p>
+          <p className="rp-ai-value" style={{ color: sophColor }}>{ai.sophistication ?? '—'}</p>
+        </div>
+
+        <div className="rp-ai-cell rp-ai-cell--half">
+          <p className="rp-ai-label">TARGET PROFILE</p>
+          <p className="rp-ai-value">{ai.target_profile ?? '—'}</p>
+        </div>
+
+        <div className="rp-ai-cell rp-ai-cell--half">
+          <p className="rp-ai-label">NEGOTIATION</p>
+          <p className="rp-ai-value" style={{ color: negColor }}>{ai.negotiation_likelihood ?? '—'}</p>
+        </div>
+
+        <div className="rp-ai-cell rp-ai-cell--half">
+          <p className="rp-ai-label">PAYMENT DEADLINE</p>
+          <p className="rp-ai-value">
+            {ai.payment_deadline_hours != null ? `${ai.payment_deadline_hours} HRS` : '—'}
+          </p>
+        </div>
+
+        {ai.attack_vector_hints && (
+          <div className="rp-ai-cell">
+            <p className="rp-ai-label">ATTACK VECTOR HINTS</p>
+            <p className="rp-ai-value">{ai.attack_vector_hints}</p>
+          </div>
+        )}
+
+        {ai.psychological_tactics?.length > 0 && (
+          <div className="rp-ai-cell">
+            <p className="rp-ai-label">PSYCHOLOGICAL TACTICS</p>
+            <div className="rp-ai-tags">
+              {ai.psychological_tactics.map(t => (
+                <span key={t} className="rp-ai-tag">{t}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </section>
+  )
+}
+
 function ResultPanel({ data }) {
-  const { family, dialect, heuristics } = data
+  const { family, dialect, heuristics, ai_analysis } = data
   const { iocs, urgency_keywords, payment_keywords, threat_keywords, urgency_score } = heuristics
 
   const hasIocs = Object.keys(iocs).length > 0
@@ -192,6 +280,9 @@ function ResultPanel({ data }) {
           ))}
         </section>
       )}
+
+      {/* ── AI Intelligence ────────────────────────────────── */}
+      <AiCard ai={ai_analysis} />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import './App.css'
 import bloodImg from './assets/9gtem78jepmgj4390oifvtpo12.png'
 import cursorImg from './assets/7qm8h0d555imegvquob85gn0ve.png'
 import CryptoPage from './pages/CryptoPage.jsx'
+import RansomPage from './pages/RansomPage.jsx'
 
 function Cursor() {
   const [pos, setPos] = useState({ x: -200, y: -200 })
@@ -37,7 +38,7 @@ function Header() {
         <nav className="nav">
           <Link to="/" className={location.pathname === '/' ? 'nav-active' : ''}>Home</Link>
           <Link to="/crypto" className={location.pathname === '/crypto' ? 'nav-active' : ''}>Crypto Trace</Link>
-          <a href="#">TBD</a>
+          <Link to="/ransom" className={location.pathname === '/ransom' ? 'nav-active' : ''}>Profiler</Link>
           <a href="#">TBD</a>
         </nav>
       </div>
@@ -170,6 +171,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/crypto" element={<CryptoPage />} />
+        <Route path="/ransom" element={<RansomPage />} />
       </Routes>
 
       <footer className="footer">

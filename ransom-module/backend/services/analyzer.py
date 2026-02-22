@@ -120,6 +120,14 @@ def analyze_ransom_note(text: str) -> dict:
 
     iocs = _extract_iocs(text)
 
+    # ── AI-powered extended analysis ──────────────────────────────────────
+    ai = {}
+    try:
+        from services.ai_analysis import analyze_with_ai
+        ai = analyze_with_ai(text)
+    except Exception as e:
+        ai = {"error": str(e)}
+
     return {
         "family": {
             "top":        top_family,
@@ -145,4 +153,5 @@ def analyze_ransom_note(text: str) -> dict:
             "urgency_score":    urgency_score,
             "iocs":             iocs,
         },
+        "ai_analysis": ai,
     }
