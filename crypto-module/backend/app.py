@@ -4,9 +4,11 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from services.solana import profile_wallet
+from services.solana import profile_wallet, multihop_trace
 from services.scoring import classify_wallet
 from services.extract import extract_solana_wallets
+from services.labels import lookup_label, batch_lookup
+from services.tokens import get_token_holdings
 
 app = FastAPI(title="Coroner — Crypto Forensics Module")
 
@@ -26,6 +28,20 @@ class TraceReq(BaseModel):
 class ReportReq(BaseModel):
     wallet: str
     limit: int = 5
+
+
+class TokenReq(BaseModel):
+    wallet: str
+
+
+class MultihopReq(BaseModel):
+    wallet: str
+    hops: int = 2
+    limit: int = 2
+
+
+class LabelReq(BaseModel):
+    addresses: list[str]
 
 
 @app.post("/trace")
@@ -124,22 +140,57 @@ def report(req: ReportReq):
         f"{age_ctx} {density_ctx} {repeat_ctx} {verdict}"
     ).strip()
 
+    # Enrich counterparties with on-chain labels
+    top_with_labels = []
+    for cp in profile.get("top_counterparties", []):
+        entry = {"wallet": cp["wallet"], "count": cp["count"]}
+        lbl = lookup_label(cp["wallet"])
+        if lbl:
+            entry["label"]       = lbl["label"]
+            entry["category"]    = lbl["category"]
+            entry["label_color"] = lbl["color"]
+        top_with_labels.append(entry)
+
+    # Pump.fun flag — add to flags list if detected
+    pumpfun = profile.get("pumpfun_activity", False)
+    if pumpfun and "Pump.fun activity detected" not in flags:
+        flags = list(flags) + ["Pump.fun memecoin activity detected in sampled transactions"]
+
     return {
         "wallet": req.wallet,
         "balance_sol": profile.get("balance_sol"),
         "summary": summary,
+        "pumpfun_activity": pumpfun,
         "risk": {
-            "score": score,
-            "label": label,
-            "flags": flags,
+            "score":       score,
+            "label":       label,
+            "flags":       flags,
             "wallet_type": wallet_type,
         },
         "profile": {
-            "tx_count": profile.get("tx_count"),
+            "tx_count":            profile.get("tx_count"),
             "unique_counterparties": profile.get("unique_counterparties"),
-            "top_counterparties": profile.get("top_counterparties"),
+            "top_counterparties":  top_with_labels,
+            "recent_transactions": profile.get("recent_transactions", []),
+            "oldest_timestamp":    profile.get("oldest_timestamp"),
+            "newest_timestamp":    profile.get("newest_timestamp"),
         }
     }
+
+
+@app.post("/tokens")
+def tokens(req: TokenReq):
+    return get_token_holdings(req.wallet)
+
+
+@app.post("/multihop")
+def multihop(req: MultihopReq):
+    return multihop_trace(req.wallet, hops=min(req.hops, 2), limit=min(req.limit, 3))
+
+
+@app.post("/labels")
+def labels(req: LabelReq):
+    return batch_lookup(req.addresses)
 
 
 @app.post("/scan-file")

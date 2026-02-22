@@ -5,6 +5,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 SOLANA_RPC = "https://api.mainnet-beta.solana.com"
 TX_CACHE = {}
 
+PUMPFUN_PROGRAM = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+
 KNOWN_PROGRAMS = {
     "11111111111111111111111111111111",
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
@@ -163,6 +165,13 @@ def profile_wallet(wallet, limit=5):
     if len(timestamps) >= 2:
         time_spread = max(timestamps) - min(timestamps)
 
+    # Pump.fun detection — flag if any sampled tx touched the pump.fun program
+    pumpfun_detected = any(
+        PUMPFUN_PROGRAM in _extract_accounts(tx_map.get(s["signature"]))
+        for s in sigs
+        if tx_map.get(s["signature"])
+    )
+
     return {
         "wallet": wallet,
         "balance_sol": balance_sol,
@@ -173,4 +182,44 @@ def profile_wallet(wallet, limit=5):
         "time_spread_seconds": time_spread,
         "oldest_timestamp": min(timestamps) if timestamps else None,
         "newest_timestamp": max(timestamps) if timestamps else None,
+        "pumpfun_activity": pumpfun_detected,
+    }
+
+
+def multihop_trace(wallet: str, hops: int = 2, limit: int = 2) -> dict:
+    """
+    Trace money flow up to `hops` hops from the seed wallet.
+    Returns all nodes (with hop distance) and edges encountered.
+    """
+    all_nodes: dict[str, int] = {wallet: 0}   # address -> hop distance
+    all_edges: list[dict] = []
+    frontier = [wallet]
+
+    for hop in range(1, hops + 1):
+        next_frontier: list[str] = []
+        for src in frontier:
+            try:
+                p = profile_wallet(src, limit=limit)
+                for cp in p.get("top_counterparties", [])[:limit]:
+                    dst = cp["wallet"]
+                    all_edges.append({
+                        "from":  src,
+                        "to":    dst,
+                        "count": cp["count"],
+                        "hop":   hop,
+                    })
+                    if dst not in all_nodes:
+                        all_nodes[dst] = hop
+                        next_frontier.append(dst)
+            except Exception:
+                pass
+        frontier = next_frontier
+        if not frontier:
+            break
+
+    nodes = [{"address": addr, "hop": h} for addr, h in all_nodes.items()]
+    return {
+        "seed":  wallet,
+        "nodes": nodes,
+        "edges": all_edges,
     }

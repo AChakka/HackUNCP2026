@@ -495,3 +495,139 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.2; }
 }
+
+/* ── Counterparty label badge ──────────────────────────────────── */
+.cp-label {
+  font-family: monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  border: 1px solid;
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+/* ── Pump.fun alert ───────────────────────────────────────────── */
+.pumpfun-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: rgba(234, 88, 12, 0.04);
+  border: 1px solid rgba(234, 88, 12, 0.25);
+  padding: 0.85rem 1rem;
+}
+
+.pumpfun-badge {
+  font-family: monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ea580c;
+  border: 1px solid #ea580c;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.pumpfun-desc {
+  font-family: monospace;
+  font-size: 0.68rem;
+  color: #555;
+  line-height: 1.7;
+}
+
+/* ── Transaction timeline ─────────────────────────────────────── */
+.timeline-svg {
+  display: block;
+  background: #030303;
+  border: 1px solid #0d0d0d;
+  overflow: visible;
+}
+
+/* ── Token holdings ───────────────────────────────────────────── */
+.token-section {
+  border-top: 1px solid #0d0d0d;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.token-holdings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.token-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.token-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid #0d0d0d;
+  transition: background 0.12s;
+  margin: 0 -0.5rem;
+}
+
+.token-row:hover {
+  background: #080808;
+}
+
+.token-mint {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #666;
+  flex: 1;
+  min-width: 0;
+}
+
+.token-amount {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #444;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* ── Multi-hop graph ──────────────────────────────────────────── */
+.multihop-section {
+  border-top: 1px solid #0d0d0d;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mh-legend {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mh-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.mh-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mh-label {
+  font-family: monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: #333;
+}
