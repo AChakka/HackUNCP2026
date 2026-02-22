@@ -1,0 +1,5 @@
+timestamp,event_type,file
+2026-02-22T06:19:11.782321Z,modified,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe
+2026-02-22T06:19:17.206565Z,created,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe
+2026-02-22T06:19:17.206565Z,birth,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe
+2026-02-22T08:21:28.093142Z,accessed,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe

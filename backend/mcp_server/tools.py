@@ -3,6 +3,9 @@ import os
 import json
 from typing import List, Dict
 
+# 1. ADD THIS IMPORT: We need it to catch the specific PE error
+import pefile
+
 # Ensure the backend directory is in the path for clean imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -36,6 +39,12 @@ def register_forensic_tools(mcp):
         try:
             result = analyze_pe_file(file_path)
             return json.dumps(result, indent=2)
+        # 2. ADD THIS BLOCK: Gracefully catch non-executable files
+        except pefile.PEFormatError:
+            return json.dumps({
+                "status": "skipped", 
+                "message": "The file is not a valid PE (Portable Executable) binary (missing DOS header). It is likely a script or plain text file. Entropy analysis skipped."
+            }, indent=2)
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Entropy analysis failed: {str(e)}"})
 
@@ -47,7 +56,6 @@ def register_forensic_tools(mcp):
         Handles hashing, cache-checking, and file uploading automatically.
         """
         try:
-            # Note: virustotal_scan is async, so we MUST await it
             result = await virustotal_scan(file_path)
             return json.dumps(result, indent=2)
         except Exception as e:
