@@ -77,9 +77,9 @@ function CoronerPage() {
       const wrapper = document.createElement('div');
       wrapper.style.cssText = [
         'position:absolute', 'left:-9999px', 'top:0',
-        'width:900px', 'background:#ffffff', 'color:#111827',
-        'font-family:Inter,Roboto,Helvetica,Arial,sans-serif',
-        'font-size:14px', 'line-height:1.6',
+        'width:900px', 'background:#ffffff', 'color:#111',
+        'font-family:Georgia,serif',
+        'font-size:14px', 'line-height:1.7',
         'padding:48px 56px', 'box-sizing:border-box',
         'max-height:none', 'overflow:visible',
       ].join(';');
@@ -91,66 +91,67 @@ function CoronerPage() {
 
         .pdf-header { margin-bottom: 28px; }
         .pdf-title {
-          font-size: 24px; font-weight: 700; color: #0f172a;
+          font-size: 24px; font-weight: 700; color: #000;
           margin: 0 0 6px 0; letter-spacing: -0.5px;
+          font-family: Georgia, serif;
         }
         .pdf-meta {
-          font-size: 11px; color: #64748b; margin: 0 0 20px 0;
+          font-size: 11px; color: #555; margin: 0 0 20px 0;
           text-transform: uppercase; letter-spacing: 0.06em;
+          font-family: 'Courier New', Courier, monospace;
         }
         .pdf-divider {
-          border: none; border-top: 2px solid #e2e8f0; margin: 0 0 32px 0;
+          border: none; border-top: 2px solid #000; margin: 0 0 32px 0;
         }
 
         .pdf-doc p {
-          margin: 0 0 14px 0;
+          margin: 0 0 14px 0; color: #111;
           break-inside: avoid; page-break-inside: avoid;
         }
 
         .pdf-doc h1 {
-          font-size: 22px; font-weight: 700; color: #0f172a;
+          font-size: 22px; font-weight: 700; color: #000;
           margin: 36px 0 12px; padding-bottom: 8px;
-          border-bottom: 2px solid #cbd5e1;
+          border-bottom: 2px solid #000;
           break-after: avoid; page-break-after: avoid;
         }
         .pdf-doc h2 {
-          font-size: 18px; font-weight: 700; color: #1e293b;
+          font-size: 18px; font-weight: 700; color: #000;
           margin: 28px 0 10px;
           break-after: avoid; page-break-after: avoid;
         }
         .pdf-doc h3 {
-          font-size: 15px; font-weight: 600; color: #334155;
+          font-size: 15px; font-weight: 600; color: #222;
           margin: 22px 0 8px;
           break-after: avoid; page-break-after: avoid;
         }
 
         .pdf-doc ul, .pdf-doc ol { margin: 0 0 14px 24px; padding: 0; }
-        .pdf-doc li { margin-bottom: 4px; }
+        .pdf-doc li { margin-bottom: 4px; color: #111; }
 
         .pdf-doc blockquote {
           margin: 16px 0; padding: 12px 16px;
-          border-left: 4px solid #94a3b8;
-          background: #f8fafc; color: #475569; font-style: italic;
-          border-radius: 0 4px 4px 0;
+          border-left: 4px solid #555;
+          background: #f5f5f5; color: #444; font-style: italic;
           break-inside: avoid; page-break-inside: avoid;
         }
         .pdf-doc blockquote p { margin: 0; }
 
         .pdf-doc code {
           font-family: 'Courier New', Courier, monospace;
-          font-size: 12px; background: #f1f5f9; color: #b91c1c;
-          padding: 2px 5px; border-radius: 3px;
+          font-size: 12px; background: #f0f0f0; color: #111;
+          padding: 2px 5px;
           white-space: pre-wrap; word-break: break-all;
         }
         .pdf-doc pre {
-          background: #f1f5f9; border: 1px solid #e2e8f0;
-          border-radius: 6px; padding: 14px 16px; margin: 0 0 16px;
+          background: #f0f0f0; border: 1px solid #ccc;
+          padding: 14px 16px; margin: 0 0 16px;
           overflow: visible;
           break-inside: avoid; page-break-inside: avoid;
         }
         .pdf-doc pre code {
-          background: transparent; color: #1e293b;
-          padding: 0; border-radius: 0;
+          background: transparent; color: #111;
+          padding: 0;
           white-space: pre-wrap; word-break: break-all; font-size: 12px;
         }
 
@@ -160,16 +161,15 @@ function CoronerPage() {
           break-inside: avoid; page-break-inside: avoid;
         }
         .pdf-doc th {
-          background: #1e293b; color: #f8fafc; padding: 9px 12px;
+          background: #111; color: #fff; padding: 9px 12px;
           text-align: left; font-weight: 600; font-size: 12px;
           text-transform: uppercase; letter-spacing: 0.05em;
-          border-bottom: 2px solid #0f172a;
         }
         .pdf-doc td {
-          padding: 8px 12px; border-bottom: 1px solid #e2e8f0;
-          vertical-align: top; color: #1e293b;
+          padding: 8px 12px; border-bottom: 1px solid #ccc;
+          vertical-align: top; color: #111;
         }
-        .pdf-doc tbody tr:nth-child(even) td { background: #f8fafc; }
+        .pdf-doc tbody tr:nth-child(even) td { background: #f9f9f9; }
         .pdf-doc tbody tr:last-child td { border-bottom: none; }
 
         .pdf-doc img {
@@ -235,12 +235,12 @@ function CoronerPage() {
 
       const addFooter = (doc, pg) => {
         doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
+        doc.setTextColor(120, 120, 120);
         const fy = pdfHeight - marginBot;
         doc.text(FOOTER_TEXT, marginX, fy);
         const pgLabel = `Page ${pg}`;
         doc.text(pgLabel, pdfWidth - marginX - doc.getTextWidth(pgLabel), fy);
-        doc.setDrawColor(210, 210, 210);
+        doc.setDrawColor(180, 180, 180);
         doc.line(marginX, fy - 2.5, pdfWidth - marginX, fy - 2.5);
         doc.setTextColor(0, 0, 0);
         doc.setDrawColor(0, 0, 0);

