@@ -1,1 +1,8 @@
 .env
+*.pyc
+.env
+.env
+data/security_events.log
+data/suspicious_timeline.csv
+backend/forensic_engine/__pycache__/timeline.cpython-311.pyc
+backend/forensic_engine/__pycache__/timeline.cpython-311.pyc

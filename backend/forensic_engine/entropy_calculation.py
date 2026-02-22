@@ -48,6 +48,13 @@ def analyze_pe_file(file_path: str) -> dict:
     }
     
     try:
+        with open(file_path, "rb") as bf:
+            header = bf.read(2)
+            if header != b"MZ":
+                result["status"] = "skipped"
+                result["error"] = f"'{file_path}' is not a valid PE file (missing MZ header). Skipping entropy calculation."
+                return result
+
         # pefile.PE will read the file in binary mode
         try:
             pe = pefile.PE(file_path)

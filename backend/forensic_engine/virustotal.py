@@ -12,7 +12,7 @@ VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY",'')
 
 # ── Main tool function ─────────────────────────────────────────────────────────
 
-async def virustotal_scan(file_path: str) -> dict:
+def virustotal_scan(file_path: str) -> dict:
     """
     Scan a file against VirusTotal's 70+ antivirus engines.
     Accepts a file path, hashes it internally, and returns a structured verdict.

@@ -1,0 +1,17 @@
+timestamp,event_type,file,source
+2026-02-22T08:35:11.801528Z,modified,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe,host_os
+2026-02-22T08:35:11.801528Z,created,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe,host_os
+2026-02-22T08:35:11.801528Z,birth,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe,host_os
+2026-02-22T08:35:13.358294Z,accessed,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/suspicious.exe,host_os
+2026-02-22T09:25:45.695203Z,modified,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/invoice_malicious.pdf,host_os
+2026-02-22T09:25:45.695284Z,created,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/invoice_malicious.pdf,host_os
+2026-02-22T09:25:45.695284Z,birth,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/invoice_malicious.pdf,host_os
+2026-02-22T09:25:47.326056Z,accessed,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/invoice_malicious.pdf,host_os
+2026-02-22T09:25:49.657485Z,modified,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/ransomware_sample.exe,host_os
+2026-02-22T09:25:49.657726Z,created,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/ransomware_sample.exe,host_os
+2026-02-22T09:25:49.657726Z,birth,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/ransomware_sample.exe,host_os
+2026-02-22T09:25:54.622304Z,modified,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/security_events.log,host_os
+2026-02-22T09:25:54.622379Z,created,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/security_events.log,host_os
+2026-02-22T09:25:54.622379Z,birth,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/security_events.log,host_os
+2026-02-22T09:25:55.833059Z,accessed,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/security_events.log,host_os
+2026-02-22T09:36:41.538260Z,accessed,/Users/kentohopkins/Documents/GitHub/HackUNCP2026/data/ransomware_sample.exe,host_os
