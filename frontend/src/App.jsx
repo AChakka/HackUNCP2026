@@ -272,6 +272,11 @@ function App() {
       <img src={bloodImg} className="blood-deco blood-deco--bl" alt="" aria-hidden="true" />
       <img src={bloodImg} className="blood-deco blood-deco--br" alt="" aria-hidden="true" />
       <img src={bloodImg} className="blood-deco blood-deco--mid" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--mid-left" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--top-mid" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--bot-mid" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--inner-tl" alt="" aria-hidden="true" />
+      <img src={bloodImg} className="blood-deco blood-deco--inner-br" alt="" aria-hidden="true" />
 
       <Header />
 
