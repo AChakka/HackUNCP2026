@@ -23,8 +23,12 @@ def submit_file(file_path):
 def get_report(job_id):
     # FIX 2: Append '/summary' to the endpoint so the API knows what to return
     res = requests.get(f"{BASE}/report/{job_id}/summary", headers=HEADERS)
+    if res.status_code != 200:
+        return {"status": "error", "error": f"Report not found or not ready yet. (Status: {res.status_code})"}
     return res.json()
 
 def search_hash(sha256):
     res = requests.get(f"{BASE}/search/hash", headers=HEADERS, params={"hash": sha256})
+    if res.status_code != 200:
+         return {"status": "error", "error": f"Hash lookup failed or not found. (Status: {res.status_code})"}
     return res.json()

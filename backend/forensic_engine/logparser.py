@@ -48,7 +48,7 @@ SUSPICIOUS_PATTERNS = [
 
 # ── Main tool function ─────────────────────────────────────────────────────────
 
-async def parse_log(file_path: str, max_lines: int = 2000) -> dict:
+def parse_log(file_path: str, max_lines: int = 2000) -> dict:
     """
     Parse a log file and extract structured forensic information.
     Detects failed logins, successful logins, suspicious activity,
@@ -71,15 +71,22 @@ async def parse_log(file_path: str, max_lines: int = 2000) -> dict:
     warning_count     = 0
 
     try:
+        # Prevent binary files (like .exe) from causing CPU loops or hanging log parsing
+        with open(file_path, "rb") as bf:
+            chunk = bf.read(1024)
+            if b'\0' in chunk:
+                return {"error": "Binary file detected. Log parser only accepts text/log files."}
+
+        total_lines = 0
         with open(file_path, "r", errors="replace") as f:
-            lines = f.readlines()
-
-        total_lines = len(lines)
-
-        for i, line in enumerate(lines[:max_lines]):
-            line = line.strip()
-            if not line:
-                continue
+            for i, line in enumerate(f):
+                total_lines += 1
+                if i >= max_lines:
+                    continue
+                
+                line = line.strip()
+                if not line:
+                    continue
 
             line_lower = line.lower()
 

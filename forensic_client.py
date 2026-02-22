@@ -68,37 +68,63 @@ async def run_forensic_investigation():
                     }
                 })
 
-            suspicious_file_path = os.path.join(root_dir, "data", "suspicious.exe")
+            data_dir = os.path.join(root_dir, "data")
+            if not os.path.exists(data_dir):
+                print(f"[!] Target data directory does not exist: {data_dir}")
+                return
+                
+            # Get all actual files inside the data directory, excluding hidden files or timelines
+            target_files = []
+            for file_name in os.listdir(data_dir):
+                if file_name.startswith('.'):
+                    continue
+                if file_name.endswith('.csv'):  
+                    # Don't try to analyze our own generated timelines
+                    continue
+                    
+                target_paths = os.path.join(data_dir, file_name)
+                if os.path.isfile(target_paths):
+                    target_files.append(target_paths)
+            
+            if not target_files:
+                print(f"[!] No files found in the data directory: {data_dir}. Please add files to investigate.")
+                return
+
+            file_list_str = "\n".join([f"- {path}" for path in target_files])
             
             # 3. The Strict DFIR Standard Operating Procedure (SOP)
-            # ADDED: Critical failure rule to prevent loops
+            # ADDED: Loop over the entire provided batch of files.
             prompt = (
                 f"You are an elite Digital Forensics and Incident Response (DFIR) Agent. "
-                f"Your task is to perform a comprehensive, multi-stage forensic analysis on the following file: {suspicious_file_path}\n\n"
+                f"Your task is to perform a comprehensive, multi-stage forensic analysis on the following batch of files:\n{file_list_str}\n\n"
                 
                 "You are connected to an MCP server with access to specialized tools. "
-                "You MUST follow this exact Standard Operating Procedure (SOP). Do not skip steps, and do not ask me for permission to proceed.\n\n"
+                "You MUST follow this exact Standard Operating Procedure (SOP) FOR EACH FILE sequentially. Do not skip steps, and do not ask me for permission to proceed.\n\n"
                 
                 "CRITICAL RULE: If a tool fails, returns an error, or gives you the exact same output twice, DO NOT retry it. "
-                "Note the failure in your timeline and immediately proceed to the next step in the SOP.\n\n"
+                "Note the failure in your timeline and immediately proceed to the next step for that file.\n\n"
                 
-                "### PHASE 1: Static & Reputation Triage\n"
-                "1. CALL 'get_file_timestamps' to establish when this file arrived on the system.\n"
-                "2. CALL 'analyze_entropy' to check if the file is packed or encrypted.\n"
-                "3. CALL 'lookup_file_hash' to see if Hybrid Analysis already has a report on this file.\n"
-                "4. CALL 'scan_with_virustotal' to check its reputation across AV engines.\n\n"
+                "### PHASE 1: Triaging & Artifact Extraction\n"
+                "1. CALL 'extract_file_metadata' to pull robust intelligence: MAC timestamps, MIME types, EXIF, and extension mismatches.\n"
+                "2. CALL 'parse_log_file' if the file is a text log to hunt for brute force or suspicious events.\n"
+                "3. CALL 'analyze_stego' if the file is an image (.jpg, .png) to check for embedded payloads.\n\n"
                 
-                "### PHASE 2: Dynamic Execution (Sandbox)\n"
-                "5. CALL 'submit_to_sandbox' to upload the file for behavioral analysis.\n"
-                "6. Using the Job ID from the previous step, CALL 'get_sandbox_report' to retrieve the execution results. "
+                "### PHASE 2: Static Analysis & Reputation Triage\n"
+                "4. CALL 'analyze_entropy' to check if the file is a packed executable (PE).\n"
+                "5. CALL 'lookup_file_hash' to see if Hybrid Analysis already has a report on this file.\n"
+                "6. CALL 'scan_with_virustotal' to check its reputation across AV engines.\n\n"
+                
+                "### PHASE 3: Dynamic Execution (Sandbox)\n"
+                "7. CALL 'submit_to_sandbox' to upload the file for behavioral analysis.\n"
+                "8. Using the Job ID from the previous step, CALL 'get_sandbox_report' to retrieve the execution results. "
                 "(Note: If the report says it is still processing, wait a moment and try again if your tool loop allows, or note it in the final report).\n\n"
                 
-                "### PHASE 3: Incident Context & Reporting\n"
-                "7. CALL 'build_incident_timeline' using the target file path to see what else happened around the same time.\n"
-                "8. CALL 'export_timeline_csv' to save the timeline data for the evidence locker.\n\n"
+                "### PHASE 4: Incident Context & Reporting\n"
+                "9. Once all individual files have been processed, CALL 'build_incident_timeline' using the list of ALL target file paths to build a master timeline.\n"
+                "10. CALL 'export_timeline_csv' to save the compiled timeline data for the evidence locker.\n\n"
                 
-                "Once you have successfully executed all available tools and gathered the evidence, generate a highly detailed final 'DFIR Executive Report'. "
-                "Include a definitive verdict (Malicious, Suspicious, or Benign), a summary of the malware's capabilities, and the timeline of events."
+                "Once you have successfully executed all available tools for all files and gathered the overall evidence, generate a highly detailed final 'DFIR Master Executive Report'. "
+                "Include definitive verdicts per file (Malicious, Suspicious, or Benign), a holistic view of the attack simulation based on the combination of behaviors, and the synthesized timeline of events."
             )
             
             messages = [{"role": "user", "content": prompt}]
@@ -110,7 +136,7 @@ async def run_forensic_investigation():
             # ==========================================
             # 4. THE SCALABLE AGENT LOOP (Now with Circuit Breaker!)
             # ==========================================
-            max_iterations = 15
+            max_iterations = 30 # Increased because we are analyzing multiple files.
             iteration_count = 0
             
             while iteration_count < max_iterations:
@@ -158,6 +184,7 @@ async def run_forensic_investigation():
             
             if iteration_count >= max_iterations:
                 print("\n[!] CIRCUIT BREAKER TRIPPED: Maximum iterations reached. The agent was forced to stop to prevent an infinite loop.")
+                print("[!] NOTE: Because you are analyzing an entire directory of files, you may need to increase the loop max_iterations limit on line 161 (currently 30).")
 
 if __name__ == "__main__":
     try:

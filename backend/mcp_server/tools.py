@@ -2,6 +2,8 @@ import sys
 import os
 import json
 from typing import List, Dict
+
+# 1. ADD THIS IMPORT: We need it to catch the specific PE error
 import pefile
 
 # Ensure the backend directory is in the path for clean imports
@@ -21,45 +23,50 @@ from forensic_engine.api_enrichment import (
     save_timeline_tool
 )
 from forensic_engine.virustotal import virustotal_scan
-from forensic_engine.log_parser import parse_log
+from forensic_engine.metadata import extract_metadata
+from forensic_engine.logparser import parse_log
+from forensic_engine.steganography import analyze_steganography
 
 def register_forensic_tools(mcp):
     """
     Registers the full suite of forensic analysis tools with the FastMCP instance.
-    Includes Static Analysis, Sandboxing, Reputation checks, and Log Parsing.
     """
     
-    # --- 1. STATIC ANALYSIS & ENTROPY ---
+    # --- STATIC ANALYSIS ---
     @mcp.tool()
-    async def analyze_entropy(file_path: str) -> str:
+    def analyze_entropy(file_path: str) -> str:
         """
-        Calculates Shannon Entropy for file sections and the overall file. 
-        Works on ANY file type. High entropy (>7.0) often indicates packed 
-        malware or encrypted data.
+        Calculates Shannon Entropy for PE file sections. 
+        High entropy (>7.0) often indicates packed or encrypted malware.
         """
         try:
-            # The updated analyze_pe_file handles its own errors and fallbacks
             result = analyze_pe_file(file_path)
             return json.dumps(result, indent=2)
+        # 2. ADD THIS BLOCK: Gracefully catch non-executable files
+        except pefile.PEFormatError:
+            return json.dumps({
+                "status": "skipped", 
+                "message": "The file is not a valid PE (Portable Executable) binary (missing DOS header). It is likely a script or plain text file. Entropy analysis skipped."
+            }, indent=2)
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Entropy analysis failed: {str(e)}"})
 
-    # --- 2. MULTI-ENGINE REPUTATION (VirusTotal) ---
+    # --- MULTI-ENGINE SCANNING (VirusTotal) ---
     @mcp.tool()
-    async def scan_with_virustotal(file_path: str) -> str:
+    def scan_with_virustotal(file_path: str) -> str:
         """
         Scans a file against 70+ AV engines via VirusTotal. 
-        Handles hashing and file uploading automatically.
+        Handles hashing, cache-checking, and file uploading automatically.
         """
         try:
-            result = await virustotal_scan(file_path)
+            result = virustotal_scan(file_path)
             return json.dumps(result, indent=2)
         except Exception as e:
             return json.dumps({"status": "error", "error": f"VirusTotal scan failed: {str(e)}"})
 
-    # --- 3. DYNAMIC ANALYSIS & SANDBOXING (Hybrid Analysis) ---
+    # --- REPUTATION & SANDBOXING (Hybrid Analysis) ---
     @mcp.tool()
-    async def lookup_file_hash(sha256: str) -> str:
+    def lookup_file_hash(sha256: str) -> str:
         """
         Checks Hybrid Analysis (Falcon Sandbox) for existing reports based on SHA256.
         Use this first to see if a file is already known as malicious.
@@ -71,7 +78,7 @@ def register_forensic_tools(mcp):
             return json.dumps({"status": "error", "error": f"Hash lookup failed: {str(e)}"})
 
     @mcp.tool()
-    async def submit_to_sandbox(file_path: str) -> str:
+    def submit_to_sandbox(file_path: str) -> str:
         """
         Uploads a file to Hybrid Analysis for live sandbox execution.
         Returns a Job ID needed to retrieve the report later.
@@ -83,9 +90,9 @@ def register_forensic_tools(mcp):
             return json.dumps({"status": "error", "error": f"Submission failed: {str(e)}"})
 
     @mcp.tool()
-    async def get_sandbox_report(job_id: str) -> str:
+    def get_sandbox_report(job_id: str) -> str:
         """
-        Retrieves the behavioral analysis summary from a sandbox run using its Job ID.
+        Retrieves the behavioral analysis report from a sandbox run using its Job ID.
         """
         try:
             result = hybrid_analysis_report(job_id)
@@ -93,26 +100,12 @@ def register_forensic_tools(mcp):
         except Exception as e:
             return json.dumps({"status": "error", "error": f"Report retrieval failed: {str(e)}"})
 
-    # --- 4. LOG ANALYSIS TOOL ---
+    # --- TIMELINE & METADATA ---
     @mcp.tool()
-    async def analyze_log_file(file_path: str, max_lines: int = 2000) -> str:
-        """
-        Parse a log file (auth.log, syslog, nginx, Apache, or Windows events).
-        Extracts IPs, usernames, failed/successful logins, and flags brute force attacks.
-        """
-        try:
-            # parse_log is async, so we await the results
-            result = await parse_log(file_path, max_lines)
-            return json.dumps(result, indent=2)
-        except Exception as e:
-            return json.dumps({"status": "error", "error": f"Log parsing failed: {str(e)}"})
-
-    # --- 5. TIMELINE & METADATA ---
-    @mcp.tool()
-    async def get_file_timestamps(file_path: str) -> str:
+    def get_file_timestamps(file_path: str) -> str:
         """
         Extracts MACB (Modified, Accessed, Created, Birth) timestamps from a file.
-        Essential for detecting timestomping.
+        Essential for detecting timestomping and file creation windows.
         """
         try:
             result = file_timestamps_tool(file_path)
@@ -121,7 +114,7 @@ def register_forensic_tools(mcp):
             return json.dumps({"status": "error", "error": f"Metadata extraction failed: {str(e)}"})
 
     @mcp.tool()
-    async def build_incident_timeline(file_paths: List[str]) -> str:
+    def build_incident_timeline(file_paths: List[str]) -> str:
         """
         Takes a list of absolute file paths and returns a sorted chronological timeline 
         of all file-system events related to those files.
@@ -133,7 +126,7 @@ def register_forensic_tools(mcp):
             return json.dumps({"status": "error", "error": f"Timeline build failed: {str(e)}"})
 
     @mcp.tool()
-    async def export_timeline_csv(events_json: str, output_path: str) -> str:
+    def export_timeline_csv(events_json: str, output_path: str) -> str:
         """
         Saves a generated timeline into a CSV file for reporting.
         Args:
@@ -146,5 +139,43 @@ def register_forensic_tools(mcp):
             return f"Successfully exported timeline to {path}"
         except Exception as e:
             return json.dumps({"status": "error", "error": f"CSV export failed: {str(e)}"})
+
+    # --- NEW TOOLS ---
+    @mcp.tool()
+    def extract_file_metadata(file_path: str) -> str:
+        """
+        Extract detailed metadata from any file including timestamps, MIME type, file size, author info, GPS, etc.
+        """
+        try:
+            from forensic_engine.metadata import extract_metadata
+            # extract_metadata is an async function in metadata.py!
+            # Let's import asyncio to run it synchronously here if needed, or change it in metadata.py.
+            import asyncio
+            result = asyncio.run(extract_metadata(file_path))
+            return json.dumps(result, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "error": f"Metadata extraction failed: {str(e)}"})
+
+    @mcp.tool()
+    def parse_log_file(file_path: str, max_lines: int = 2000) -> str:
+        """
+        Parse a log file to extract failed logins, successful logins, suspicious events, etc.
+        """
+        try:
+            result = parse_log(file_path, max_lines)
+            return json.dumps(result, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "error": f"Log parsing failed: {str(e)}"})
+
+    @mcp.tool()
+    def analyze_stego(file_path: str) -> str:
+        """
+        Detect hidden data in images using statistical analysis (steganography).
+        """
+        try:
+            result = analyze_steganography(file_path)
+            return json.dumps(result, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "error": f"Steganography analysis failed: {str(e)}"})
 
     return mcp

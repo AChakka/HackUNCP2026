@@ -214,6 +214,10 @@ def analyze_steganography(file_path: str) -> dict:
       - appended data, file size, and EXIF findings
     """
     try:
+        # Prevent OOM crashes on massive or heavily tampered image files
+        if os.path.getsize(file_path) > 50 * 1024 * 1024:
+            return {"error": f"Image file exceeds the 50MB limit for statistical analysis (size: {os.path.getsize(file_path)} bytes). Steganography analysis skipped to preserve memory."}
+
         img = Image.open(file_path)
         img.load()
     except Exception as e:
