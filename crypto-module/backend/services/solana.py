@@ -1,29 +1,79 @@
 import requests
 
-# Public Solana RPC (rate-limited but fine for demos)
 SOLANA_RPC = "https://api.mainnet-beta.solana.com"
 
-def get_signatures(wallet: str, limit: int = 25):
+
+# Get recent transaction signatures
+def get_signatures(wallet, limit=20):
+
     payload = {
         "jsonrpc": "2.0",
         "id": 1,
         "method": "getSignaturesForAddress",
-        "params": [wallet, {"limit": limit}]
+        "params": [
+            wallet,
+            {
+                "limit": limit
+            }
+        ]
     }
-    r = requests.post(SOLANA_RPC, json=payload, timeout=20)
-    r.raise_for_status()
-    return r.json().get("result", [])
 
-def profile_wallet(wallet: str, limit: int = 25):
-    sigs = get_signatures(wallet, limit=limit)
-    last_ts = None
-    for s in sigs:
-        bt = s.get("blockTime")
-        if bt and (last_ts is None or bt > last_ts):
-            last_ts = bt
+    response = requests.post(SOLANA_RPC, json=payload)
 
-    return {
+    data = response.json()
+
+    if "result" not in data:
+        return []
+
+    return data["result"]
+
+
+# Get full transaction info
+def get_transaction(signature):
+
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getTransaction",
+        "params": [
+            signature,
+            "json"
+        ]
+    }
+
+    response = requests.post(SOLANA_RPC, json=payload)
+
+    return response.json().get("result")
+
+
+# Build forensic profile
+def profile_wallet(wallet, limit=10):
+
+    signatures = get_signatures(wallet, limit)
+
+    transactions = []
+
+    for sig in signatures:
+
+        tx = get_transaction(sig["signature"])
+
+        if tx:
+            transactions.append({
+
+                "signature": sig["signature"],
+
+                "timestamp": sig.get("blockTime")
+
+            })
+
+    profile = {
+
         "wallet": wallet,
-        "tx_count_sampled": len(sigs),
-        "last_activity_unix": last_ts
+
+        "tx_count": len(transactions),
+
+        "recent_transactions": transactions
+
     }
+
+    return profile
