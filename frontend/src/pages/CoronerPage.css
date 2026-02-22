@@ -82,7 +82,7 @@
 .coroner-report-text {
   font-family: 'Courier New', monospace;
   font-size: 0.78rem;
-  color: #bbb;
+  color: #aa9898;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
@@ -239,7 +239,7 @@
 .coroner-report-markdown {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: #ddd;
+  color: #000000;
   line-height: 1.6;
 }
 
